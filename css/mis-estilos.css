@@ -1,0 +1,54 @@
+<style>
+	body {
+		padding-top: 40px;
+		padding-bottom: 40px;
+	}
+
+	 .login{
+		max-width: 330px;
+		padding: 15px;
+		margin: 0 auto;
+	}
+
+	 .enlace-sesion{
+	 	margin-right:11px;
+	 }
+	 .enlace-menu{
+	 	margin-right:13px;
+	 	color:#245DC1;
+	 }
+	 .enlace-menu2{
+	 	margin-left:10px;
+	 	color:#444449;
+	 }
+	 #menu-sec{
+	 	border-bottom:1px #EEEEEE solid;
+	 }
+	 .menu-footer{
+	 	font-size:11px;
+	 	color:#245DC1;
+	 	margin-right:2px;
+	 }
+	 #sha{
+	 	margin-top: 50px;
+	 	max-width: 340px;
+	 	-webkit-box-shadow :  0px 0px 18px 0px rgba(48, 50, 50, 0.48);
+	 	-moz-box-shadow :     0px 0px 18px 0px rgba(48, 50, 50, 0.48);
+	 	box-shadow :          0px 0px 18px 0px rgba(48, 50, 50, 0.48);
+
+	 	border-radius: 6%;
+	 }
+
+	 #avatar {
+	 	width: 96px;
+	 	height: 96px;
+	 	margin: 0px auto 10px;
+	 	display: block;
+	 	border-radius: 50%;	
+	 }
+
+	 #icon{
+	 	margin-right: 16px;
+	 }
+
+	</style>
