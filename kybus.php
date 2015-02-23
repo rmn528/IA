@@ -2,21 +2,9 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>Kybus</title>
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
-	<style>
-		.zelda{
-			max-width: 7em;
-			max-height: 6em;
-		}
-		.mundos{
-			max-width: 10em;
-			max-height: 10em;
-		}		
-		#ex1Slider .slider-selection {
-			background: #BABABA;
-		}
-	</style>
+	<link rel="stylesheet" type="text/css" href="css/mis-estilos.css">
 </head>
 <body>	
 	<div class="container-fluid">
@@ -24,31 +12,33 @@
 			<strong><h3>Proyecto 1 kybus</h3></strong>
 		</div>
 		<div class="row">
-			<div class="col-xs-1 well">
-				<div class="thumbnail zelda" href="#">
-					<a href=""><img href="#" src="img/zelda_.gif" alt="..." class="img-responsive"></a>
+			<div class="col-xs-1 well" id = "barra">
+				<div class="thumbnail ">
+					<img src="img/zelda_.gif" id = "kybus" alt="..." class="img-responsive imagen"/>
 				</div>
-				<div class="thumbnail zelda">
-					<a href=""><img src="img/House2.gif" alt="..." class="img-responsive"></a>
+				<div class="thumbnail">
+					<img src="img/House2.gif" id = "casa" alt="..." class="img-responsive imagen"/>
 				</div>
-				<div class="thumbnail zelda">
-					<a href=""><img src="img/pasto.png" alt="..." class="img-responsive"></a>
+				<div class="thumbnail">
+					<img src="img/arbolito.jpg" id = "arbol" alt="..." class="img-responsive imagen"/>
 				</div>
-				<div class="thumbnail zelda">
-					<a href=""><img src="img/rock2.gif" alt="..." class="img-responsive"></a>
+				<div class="thumbnail">
+					<img src="img/rock2.gif" id = "roca" alt="..." class="img-responsive imagen"/>
 				</div>
-				<div class="thumbnail zelda">
-					<a href=""><img src="img/equis.png" alt="..." class="img-responsive"></a>
+				<div class="thumbnail">
+					<img src="img/pastoC.jpg" id = "pasto" alt="..." class="img-responsive imagen"/>
 				</div>
 			</div>
 			<!--Inicio del Canvas -->
-			<div class="col-xs-11 well">
-				
+			<div class="col-xs-11 well without_padding">
+				<canvas id = "mundo" class = "col-xs-12 canvas" width = "1000" height = '266' draggable = "true">Tu navegador no soporta Canvas</canvas>
 			</div>
 			<!--Fin del Canvas -->
 		</div>
 		<div class="row">
+
 			<div class="col-xs-12 well">
+				<!--
 				<div class="thumbnail col-xs-2 mundos">
 					<a href=""><img src="img/one.jpg" alt="..." class="img-responsive"></a>
 				</div>
@@ -61,17 +51,18 @@
 				<div class="thumbnail col-xs-2 mundos">
 					<a href=""><img src="img/cuatro.jpg" alt="..." class="img-responsive"></a>
 				</div>	
-
+				-->
 				<div class="col-xs-5">										
 					<div class="col-xs-10">
-						<input type="range" name="rangeInput" min="20" max="80" onchange="updateTextInput(this.value);">                                                       	
+						<input type="range" name="rangeInput" min="20" max="80" onmousemove="updateTextInput(this.value);">                                                       	
 					</div>
 					<div class="col-xs-2">
 						<input type="text" id="textInput" value="50">	
 					</div>
 					<div class="col-xs-10">
-						<input type="range" name="rangeInput" min="0" max="10" onchange="updateTextInput2(this.value);">                                                       	
+						<input type="range" name="rangeInput" min="0" max="10" onmousemove="updateTextInput2(this.value);">                                                       	
 					</div>
+					
 					<div class="col-xs-2">
 						<input type="text" id="textInput2" value="5">	
 					</div>
@@ -89,13 +80,7 @@
 	<script src="js/jquery.js"></script>	
 	<script src="js/bootstrap.js"></script>	
 	<script src="js/bootstrap-slider.js"></script>	
-	<script type="text/javascript">
-		function updateTextInput(val) {
-	      document.getElementById('textInput').value=val; 
-	    }
-	    function updateTextInput2(val) {
-	      document.getElementById('textInput2').value=val; 
-	    }
-	</script>
+	<script src="js/sliders.js"></script>
+	<script src="js/main.js"></script>
 </body>
 </html>
