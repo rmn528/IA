@@ -32,33 +32,30 @@ function addingEvent(elemento,nombreEvento,funcion){
     }
 }
 
-function addingMouseEvents(){
-    addingEvent(document,"mousemove",function(e){
-        if(e.offsetX) {
-            mouse.x = e.offsetX - 15;
-            mouse.y = e.offsetY - 15;
-        }else if(e.layerX) {
-            mouse.x = e.layerX - 15;
-            mouse.y = e.layerY - 15;
-        }
-    });
+function getMousePos(evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+    };
+  }
 
+function addingMouseEvents(){
     addingEvent(barra,'click',function(e) {
         e.preventDefault();
         elemento        = document.getElementById(e.target.id);
         ruta            = elemento.src.split('/');
         imagen          = new Image();
         imagen.src      = ruta[4] + "/" + ruta[5];
+
         dibujoElemento.imagen = imagen;
     });
 
-    addingEvent(document,'click',function(e) {
-        //console.log(canvas.getBoundingClientRect());
-        console.log(e.offsetX + " " +e.offsetY);
-        console
-        dibujoElemento.x      = e.offsetX -15;
-        dibujoElemento.y      = e.offsetY -15;
-        //console.log(dibujoElemento);
+    addingEvent(canvas,'click',function(e) {
+        posicion              = getMousePos(e);
+        console.log(posicion);
+        dibujoElemento.x      = posicion.x -15;
+        dibujoElemento.y      = posicion.y -15;
     });
 }
 
@@ -75,7 +72,6 @@ function addingKeyBoardEvents(){
 }
 
 function drawNewElement(){
-    //console.log(dibujoElemento);
     ctx.drawImage(dibujoElemento.imagen,dibujoElemento.x,dibujoElemento.y,32,32);
 }
 

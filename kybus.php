@@ -31,7 +31,7 @@
 			</div>
 			<!--Inicio del Canvas -->
 			<div class="col-xs-11 well without_padding">
-				<canvas id = "mundo" class = "col-xs-12 canvas" width = "1000" height = '266' draggable = "true">Tu navegador no soporta Canvas</canvas>
+				<canvas id = "mundo" class = "canvas" width = "1200" height = '342' draggable = "true">Tu navegador no soporta Canvas</canvas>
 			</div>
 			<!--Fin del Canvas -->
 		</div>
