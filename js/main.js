@@ -52,10 +52,13 @@ function addingMouseEvents(){
         dibujoElemento.imagen = imagen;
     });
 
-    addingEvent(canvas,'click',function(e) {
-        dibujoElemento.x      = e.offsetX-15;
-        dibujoElemento.y      = e.offsetY-15;
-        console.log(dibujoElemento);
+    addingEvent(document,'click',function(e) {
+        //console.log(canvas.getBoundingClientRect());
+        console.log(e.offsetX + " " +e.offsetY);
+        console
+        dibujoElemento.x      = e.offsetX -15;
+        dibujoElemento.y      = e.offsetY -15;
+        //console.log(dibujoElemento);
     });
 }
 
@@ -72,7 +75,7 @@ function addingKeyBoardEvents(){
 }
 
 function drawNewElement(){
-    console.log(dibujoElemento);
+    //console.log(dibujoElemento);
     ctx.drawImage(dibujoElemento.imagen,dibujoElemento.x,dibujoElemento.y,32,32);
 }
 
