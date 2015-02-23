@@ -11,30 +11,30 @@
 		<div class="row well">
 			<strong><h3>Proyecto 1 kybus</h3></strong>
 		</div>
-		<div class="row" id = "barra">
-			<div class="thumbnail col-xs-1">
-				<img src="img/zelda_.gif" id = "kybus" alt="..." class="img-responsive imagen"/>
+		<div class="row">
+			<div class="col-xs-1 well" id = "barra">
+				<div class="thumbnail ">
+					<img src="img/zelda_.gif" id = "kybus" alt="..." class="img-responsive imagen"/>
+				</div>
+				<div class="thumbnail">
+					<img src="img/House2.gif" id = "casa" alt="..." class="img-responsive imagen"/>
+				</div>
+				<div class="thumbnail">
+					<img src="img/arbolito.jpg" id = "arbol" alt="..." class="img-responsive imagen"/>
+				</div>
+				<div class="thumbnail">
+					<img src="img/rock2.gif" id = "roca" alt="..." class="img-responsive imagen"/>
+				</div>
+				<div class="thumbnail">
+					<img src="img/pastoC.jpg" id = "pasto" alt="..." class="img-responsive imagen"/>
+				</div>
 			</div>
-			<div class="thumbnail col-xs-1">
-				<img src="img/House2.gif" id = "casa" alt="..." class="img-responsive imagen"/>
+			<!--Inicio del Canvas -->
+			<div class="col-xs-11 well without_padding">
+				<canvas id = "mundo" class = "col-xs-12 canvas" width = "1000" height = '266' draggable = "true">Tu navegador no soporta Canvas</canvas>
 			</div>
-			<div class="thumbnail col-xs-1">
-				<img src="img/arbolito.jpg" id = "arbol" alt="..." class="img-responsive imagen"/>
-			</div>
-			<div class="thumbnail col-xs-1">
-				<img src="img/rock2.gif" id = "roca" alt="..." class="img-responsive imagen"/>
-			</div>
-			<div class="thumbnail col-xs-1">
-				<img src="img/pastoC.jpg" id = "pasto" alt="..." class="img-responsive imagen"/>
-			</div>	
-
-		</div>
-		<canvas id = "mundo" class = "col-xs-12 canvas" width = "1000" height = '266' draggable = "true">Tu navegador no soporta Canvas</canvas>
-		<!--Inicio del Canvas -->
-			
-			
-			
 			<!--Fin del Canvas -->
+		</div>
 		<div class="row">
 
 			<div class="col-xs-12 well">
