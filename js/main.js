@@ -1,5 +1,8 @@
 var canvas         = document.getElementById('mundo');
 var barra          = document.getElementById('barra');
+var rangoDibujar   = document.getElementById('textInput');
+var dragger1       = document.getElementById('dragger1');
+
 var ctx            = canvas.getContext('2d');
 var teclado        = {};
 var mouse          = {};
@@ -19,14 +22,6 @@ var casa           = {
                         exists : 0
                      };
 var mapa;
-
-function printMap(){
-    for (var i = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, i++) {
-        for (var j = 0,cordY = 0; cordY < canvas.height; cordY += pasto.height, j++) {
-            console.log(mapa[i][j]);
-        }
-    }
-}
 
 function loadMedia(){
     pasto     = new Image();
@@ -93,11 +88,15 @@ function addingMouseEvents(){
     });
 
     addingEvent(canvas,'click',function(e) {
+        e.preventDefault();
         posicion              = getMousePos(e);
         if(!jQuery.isEmptyObject(dibujoElemento)){
             dibujoElemento.x      = posicion.x -15;
             dibujoElemento.y      = posicion.y -15;
         }
+    });
+    addingEvent(document,'mouseDown ',function(e){
+        console.log("hola");
     });
 }
 
