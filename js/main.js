@@ -317,8 +317,8 @@ function move(){
         }
         if((teclado[37] || teclado[39] || teclado[38] || teclado[40]) && mapa[kybus.i][kybus.j].objeto == ''){
             mapa[kybus.i][kybus.j].obstaculo        = 1;
-            mapa[kybus.i][kybus.j].tipo_obstaculo   = elemento.id;
-            elemento                                = document.getElementById(elemento.id);
+            mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
+            elemento                                = document.getElementById('kybus');
             ruta                                    = elemento.src.split('/');
             imagen                                  = new Image();
             imagen.src                              = ruta[4] + "/" + ruta[5];
