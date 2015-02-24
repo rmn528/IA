@@ -22,6 +22,7 @@ var casa           = {
                         exists : 0
                      };
 var mapa;
+var cantElementos  = 0;
 
 function loadMedia(){
     pasto     = new Image();
@@ -48,6 +49,33 @@ function loadMedia(){
     }
     pasto.onload = function(){
         var intervalo = window.setInterval(frameLoop,1000/55);
+    }
+}
+
+function drawMapElements(){
+    bandera = 1;
+    while(cantElementos){
+        i       = Math.floor((Math.random() * mapa.length) + 0);
+        j       = Math.floor((Math.random() * mapa[0].length) + 0);
+        if(mapa[i][j].objeto == ''){
+            if(bandera){
+                mapa[i][j].tipo_obstaculo   = 'roca';
+                elemento                    = document.getElementById('roca');
+                bandera                     = 0;
+            }else{
+                mapa[i][j].tipo_obstaculo   = 'arbol';
+                elemento                    = document.getElementById('arbol');
+                bandera                     = 1;
+            }
+            mapa[i][j].obstaculo        = 1;
+            mapa[i][j].tipo_obstaculo   = elemento.id;
+            elemento                    = document.getElementById(elemento.id);
+            ruta                        = elemento.src.split('/');
+            imagen                      = new Image();
+            imagen.src                  = ruta[4] + "/" + ruta[5];
+            mapa[i][j].objeto           = imagen;
+            cantElementos--;
+        }
     }
 }
 
@@ -95,8 +123,47 @@ function addingMouseEvents(){
             dibujoElemento.y      = posicion.y -15;
         }
     });
-    addingEvent(document,'mouseDown ',function(e){
-        console.log("hola");
+
+    addingEvent(dragger1,'click',function(e){
+        porcentaje    = dragger1.value;
+        cantElementos = Math.round(porcentaje*270/100);
+        x = mapa.length;
+        y = mapa[0].length;
+        for (var i = 0;i < x;i++) {
+            for (var j = 0; j < y;j++) {
+                if(mapa[i][j].tipo_obstaculo == 'kybus'){
+                    if(kybus.exists == 1){
+                        mapa[kybus.i][kybus.j].kybus = 0; 
+                        mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+                        mapa[kybus.i][kybus.j].objeto = '';
+                    }
+                    kybus = {
+                        i : 0,
+                        j : 0,
+                        x : 0,
+                        y : 0,
+                        exists : 0
+                    };
+                }else if(mapa[i][j].tipo_obstaculo == 'casa'){
+                    if(casa.exists == 1){
+                        mapa[casa.i][casa.j].casa = 0; 
+                        mapa[casa.i][casa.j].tipo_obstaculo = '';
+                        mapa[casa.i][casa.j].objeto = '';
+                    }
+                    casa = {
+                        i : 0,
+                        j : 0,
+                        x : 0,
+                        y : 0,
+                        exists : 0
+                    };
+                }
+                mapa[i][j].kybus = 0;
+                mapa[i][j].casa  = 0;
+                mapa[i][j].tipo_obstaculo = '';
+                mapa[i][j].objeto = '';
+            }
+        }
     });
 }
 
@@ -104,6 +171,7 @@ function addingKeyBoardEvents(){
     addingEvent(document,"keydown",function(e){
         //ponemos en true la tecla presionada
         teclado[e.keyCode] = true;
+        move();
     });
 
     addingEvent(document,"keyup",function(e){
@@ -198,14 +266,70 @@ function drawElements(){
     for (var i = 0;i < x;i++) {
         for (var j = 0; j < y;j++) {
             if(mapa[i][j].objeto != ''){
-                ctx.drawImage(mapa[i][j].objeto,mapa[i][j].x,mapa[i][j].y,32,32);
+                ctx.drawImage(mapa[i][j].objeto,mapa[i][j].x+5,mapa[i][j].y+3,32,32);
             }
+        }
+    }
+}
+
+function move(){
+    if(kybus.exists == 1){
+        if(teclado[37]){
+            if(kybus.i - 1 >=0 && mapa[kybus.i - 1][kybus.j].objeto == ''){
+                mapa[kybus.i][kybus.j].kybus = 0;
+                mapa[kybus.i][kybus.j].casa  = 0;
+                mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+                mapa[kybus.i][kybus.j].objeto = '';
+                kybus.i = kybus.i - 1;
+                kybus.x = mapa[kybus.i][kybus.j].x;
+                kybus.y = mapa[kybus.i][kybus.j].y;
+            }
+        }else if(teclado[39]){
+            if(kybus.i + 1 <= mapa.length -1 && mapa[kybus.i + 1][kybus.j].objeto == ''){
+                mapa[kybus.i][kybus.j].kybus = 0;
+                mapa[kybus.i][kybus.j].casa  = 0;
+                mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+                mapa[kybus.i][kybus.j].objeto = '';
+                kybus.i = kybus.i + 1;
+                kybus.x = mapa[kybus.i][kybus.j].x;
+                kybus.y = mapa[kybus.i][kybus.j].y;
+            }
+        }else if(teclado[38]){
+            if(kybus.j - 1 >=0 && mapa[kybus.i][kybus.j - 1].objeto == ''){
+                mapa[kybus.i][kybus.j].kybus = 0;
+                mapa[kybus.i][kybus.j].casa  = 0;
+                mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+                mapa[kybus.i][kybus.j].objeto = '';
+                kybus.j = kybus.j - 1;
+                kybus.x = mapa[kybus.i][kybus.j].x;
+                kybus.y = mapa[kybus.i][kybus.j].y;
+            }
+        }else if(teclado[40]){
+            if(kybus.j + 1 <= mapa[0].length-1 && mapa[kybus.i][kybus.j + 1].objeto == ''){
+                mapa[kybus.i][kybus.j].kybus = 0;
+                mapa[kybus.i][kybus.j].casa  = 0;
+                mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+                mapa[kybus.i][kybus.j].objeto = '';
+                kybus.j = kybus.j + 1;
+                kybus.x = mapa[kybus.i][kybus.j].x;
+                kybus.y = mapa[kybus.i][kybus.j].y;
+            }
+        }
+        if((teclado[37] || teclado[39] || teclado[38] || teclado[40]) && mapa[kybus.i][kybus.j].objeto == ''){
+            mapa[kybus.i][kybus.j].obstaculo        = 1;
+            mapa[kybus.i][kybus.j].tipo_obstaculo   = elemento.id;
+            elemento                                = document.getElementById(elemento.id);
+            ruta                                    = elemento.src.split('/');
+            imagen                                  = new Image();
+            imagen.src                              = ruta[4] + "/" + ruta[5];
+            mapa[kybus.i][kybus.j].objeto           = imagen;
         }
     }
 }
 
 function frameLoop(){
     drawBackground();
+    drawMapElements();
     NewElement();
     drawElements();
 }

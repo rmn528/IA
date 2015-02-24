@@ -54,17 +54,17 @@
 				-->
 				<div class="col-xs-5">										
 					<div class="col-xs-10">
-						<input type="range" name="rangeInput" min="20" max="80" onmousemove="updateTextInput(this.value);">                                                       	
+						<input type="range" name="rangeInput" min="0" max="80" onmousemove="updateTextInput(this.value);" onclick="updateTextInput(this.value);" id = "dragger1">                                                       	
 					</div>
 					<div class="col-xs-2">
-						<input type="text" id="textInput" value="50">	
+						<input type="text" id="textInput" value="50" disabled="disabled">	
 					</div>
 					<div class="col-xs-10">
-						<input type="range" name="rangeInput" min="0" max="10" onmousemove="updateTextInput2(this.value);">                                                       	
+						<input type="range" name="rangeInput" min="0" max="10" onmousemove="updateTextInput2(this.value);" onclick="updateTextInput(this.value);" id = "dragger2">                                                       	
 					</div>
 					
 					<div class="col-xs-2">
-						<input type="text" id="textInput2" value="5">	
+						<input type="text" id="textInput2" value="5" disabled="disabled">	
 					</div>
 				</div>
 
