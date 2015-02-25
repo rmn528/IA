@@ -82,6 +82,7 @@ function drawMapElements(){
                 elemento                    = document.getElementById('arbol');
                 bandera                     = 1;
             }
+            visitados[i][j]             = true;
             mapa[i][j].obstaculo        = 1;
             mapa[i][j].tipo_obstaculo   = elemento.id;
             elemento                    = document.getElementById(elemento.id);
@@ -134,9 +135,8 @@ function addingMouseEvents(){
 
     addingEvent(btnInicio,'click',function(e){
         if(casa.exists && kybus.exists){
-            buscando = setInterval(function(){
-                amplitud();
-            },1000/velocidad);
+            buscando = setInterval(amplitud,1000/velocidad);
+            console.log(cola);
         }
     });
 
@@ -252,6 +252,7 @@ function NewElement(){
                         paso.i           = kybus.i;
                         paso.j           = kybus.j;
                         pila[0]          = paso; 
+                        cola[0]          = paso;
                     }else{
                         if(casa.exists == 1){
                             mapa[casa.i][casa.j].casa = 0; 
@@ -264,6 +265,13 @@ function NewElement(){
                         casa.i           = i;
                         casa.j           = j;
                         casa.exists      = 1;
+                        paso =  {
+                            i : 0,
+                            j : 0
+                        };
+                        paso.i           = kybus.i;
+                        paso.j           = kybus.j;
+                        cola[0]          = paso;
                     }
                     mapa[i][j].tipo_obstaculo   = dibujoElemento.id;
                     elemento                    = document.getElementById(dibujoElemento.id);
@@ -303,7 +311,6 @@ function NewElement(){
         };
         paso.i           = kybus.i;
         paso.j           = kybus.j;
-        cola[0]          = paso;
         dibujoElemento.x = -50;
         dibujoElemento.y = -50;
     }
@@ -423,13 +430,23 @@ function amplitud(){
         paso.j           = kybus.j;
         cola             = [];
         cola[0]          = paso;
+        visitados = [];
+        for (var i = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, i++) {
+            visitados[i] = [];
+        }
+        for (var i = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, i++) {
+            for (var j = 0,cordY = 0; cordY < canvas.height; cordY += pasto.height, j++) {
+                visitados[i][j] = false;
+            }
+        }
+        llegue = false;
         clearInterval(buscando);
     }
     mapa[kybus.i][kybus.j].kybus          = 0;
     mapa[kybus.i][kybus.j].casa           = 0;
     mapa[kybus.i][kybus.j].tipo_obstaculo = '';
     mapa[kybus.i][kybus.j].objeto         = '';
-    paso = cola.shift();
+    var paso = cola.shift();
     kybus.i = paso.i;
     kybus.j = paso.j;
     kybus.x = mapa[paso.i][paso.j].x;
@@ -441,24 +458,29 @@ function amplitud(){
     imagen                                  = new Image();
     imagen.src                              = ruta[4] + "/" + ruta[5];
     mapa[kybus.i][kybus.j].objeto           = imagen;
-    visitados[paso.i][paso.j] = true;
-    if(paso.i+1 <= mapa[0].length-1 && mapa[paso.i+1][paso.j].obstaculo == 0 && visitados[paso.i+1][paso.j] == false){
-        if(casa.i == paso.i+1 && casa.j == paso.j) {
+    if(paso.i+1 < mapa[0].length-1 && mapa[paso.i+1][paso.j].obstaculo == 0 && visitados[paso.i+1][paso.j] == false){
+        if((casa.i == paso.i-1 && casa.j == paso.j) || 
+            (casa.i == paso.i+1 && casa.j == paso.j) ||
+            (casa.i == paso.i && casa.j == paso.j-1) ||
+            (casa.i == paso.i && casa.j == paso.j+1)) {
             llegue = true;
         }
-        console.log("derecha");
-        aux = {
+
+        var aux = {
             i : 0,
             j : 0
         };
         aux.i = paso.i+1;
         aux.j = paso.j;
         cola.push(aux);
-    }else if(paso.i-1 >= 0 && mapa[paso.i-1][paso.j].obstaculo == 0 && visitados[paso.i-1][paso.j] == false){
-        if(casa.i == paso.i-1 && casa.j == paso.j) {
+        visitados[paso.i][paso.j] = true;
+    }if(paso.i-1 >= 0 && mapa[paso.i-1][paso.j].obstaculo == 0 && visitados[paso.i-1][paso.j] == false){
+        if((casa.i == paso.i-1 && casa.j == paso.j) || 
+            (casa.i == paso.i+1 && casa.j == paso.j) ||
+            (casa.i == paso.i && casa.j == paso.j-1) ||
+            (casa.i == paso.i && casa.j == paso.j+1)) {
             llegue = true;
         }
-        console.log("izquierda");
         aux = {
             i : 0,
             j : 0
@@ -466,11 +488,14 @@ function amplitud(){
         aux.i = paso.i-1;
         aux.j = paso.j;
         cola.push(aux);
-    }else if(paso.j+1 <= mapa.length-1 && mapa[paso.i][paso.j+1].obstaculo == 0 && visitados[paso.i][paso.j+1] == false){
-        if(casa.i == paso.i && casa.j == paso.j+1) {
+        visitados[paso.i][paso.j] = true;
+    }if(paso.j+1 < mapa[0].length && mapa[paso.i][paso.j+1].obstaculo == 0 && visitados[paso.i][paso.j+1] == false){
+        if((casa.i == paso.i-1 && casa.j == paso.j) || 
+            (casa.i == paso.i+1 && casa.j == paso.j) ||
+            (casa.i == paso.i && casa.j == paso.j-1) ||
+            (casa.i == paso.i && casa.j == paso.j+1)) {
             llegue = true;
         }
-        console.log("abajo");
         aux = {
             i : 0,
             j : 0
@@ -478,11 +503,14 @@ function amplitud(){
         aux.i = paso.i;
         aux.j = paso.j+1;
         cola.push(aux);
-    }else if(paso.j-1 >= 0 && mapa[paso.i][paso.j-1].obstaculo == 0 && visitados[paso.i][paso.j-1] == false){
-        if(casa.i == paso.i && casa.j == paso.j-1) {
+        visitados[paso.i][paso.j] = true;
+    }if(paso.j-1 >= 0 && mapa[paso.i][paso.j-1].obstaculo == 0 && visitados[paso.i][paso.j-1] == false){
+        if((casa.i == paso.i-1 && casa.j == paso.j) || 
+            (casa.i == paso.i+1 && casa.j == paso.j) ||
+            (casa.i == paso.i && casa.j == paso.j-1) ||
+            (casa.i == paso.i && casa.j == paso.j+1)) {
             llegue = true;
         }
-        console.log("arriba");
         aux = {
             i : 0,
             j : 0
@@ -490,6 +518,7 @@ function amplitud(){
         aux.i = paso.i;
         aux.j = paso.j-1;
         cola.push(aux);
+        visitados[paso.i][paso.j] = true;
     }
 }
 
