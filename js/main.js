@@ -2,6 +2,9 @@ var canvas         = document.getElementById('mundo');
 var barra          = document.getElementById('barra');
 var rangoDibujar   = document.getElementById('textInput');
 var dragger1       = document.getElementById('dragger1');
+var dragger2       = document.getElementById('dragger2');
+var btnRegresar    = document.getElementById('regresar');
+var btnInicio      = document.getElementById('inicio');
 
 var ctx            = canvas.getContext('2d');
 var teclado        = {};
@@ -22,15 +25,26 @@ var casa           = {
                         exists : 0
                      };
 var mapa;
+var pila;
+var cola;
+var visitados;
+var llegue = false;
 var cantElementos  = 0;
+var regreso;
+var buscando;
+var velocidad = 6;
 
 function loadMedia(){
     pasto     = new Image();
     pasto.src = 'img/pastoC.jpg';
     pasto.setAttribute("class", "imagen");
-    mapa = [];
+    mapa        = [];
+    pila        = [];
+    cola        = [];
+    visitados   = [];
     for (var i = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, i++) {
-        mapa[i] = [];
+        mapa[i]      = [];
+        visitados[i] = [];
     }
     for (var i = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, i++) {
         for (var j = 0,cordY = 0; cordY < canvas.height; cordY += pasto.height, j++) {
@@ -45,6 +59,7 @@ function loadMedia(){
                             tipo_obstaculo : '',
                             objeto : ''
                          };
+            visitados[i][j] = false;
         }
     }
     pasto.onload = function(){
@@ -110,18 +125,38 @@ function getMousePos(evt) {
   }
 
 function addingMouseEvents(){
-    addingEvent(barra,'click',function(e) {
+    addingEvent(btnRegresar,'click',function(e){
+        regreso = setInterval(function(){
+            paso    = pila.pop();
+            moveXY(paso.i,paso.j);
+        },1000/velocidad);
+    });
+
+    addingEvent(btnInicio,'click',function(e){
+        if(casa.exists && kybus.exists){
+            buscando = setInterval(function(){
+                amplitud();
+            },1000/velocidad);
+        }
+    });
+
+    addingEvent(barra,'click',function(e){
         e.preventDefault();
         dibujoElemento.id     = e.target.id;
     });
 
-    addingEvent(canvas,'click',function(e) {
+    addingEvent(canvas,'click',function(e){
         e.preventDefault();
         posicion              = getMousePos(e);
         if(!jQuery.isEmptyObject(dibujoElemento)){
             dibujoElemento.x      = posicion.x -15;
             dibujoElemento.y      = posicion.y -15;
         }
+    });
+
+    addingEvent(dragger2,'click',function(e){
+        e.preventDefault();
+        velocidad = dragger2.value;
     });
 
     addingEvent(dragger1,'click',function(e){
@@ -210,6 +245,13 @@ function NewElement(){
                         kybus.i          = i;
                         kybus.j          = j;
                         kybus.exists     = 1;
+                        paso =  {
+                            i : 0,
+                            j : 0
+                        };
+                        paso.i           = kybus.i;
+                        paso.j           = kybus.j;
+                        pila[0]          = paso; 
                     }else{
                         if(casa.exists == 1){
                             mapa[casa.i][casa.j].casa = 0; 
@@ -255,6 +297,13 @@ function NewElement(){
                 }
             }
         }
+        paso =  {
+            i : 0,
+            j : 0
+        };
+        paso.i           = kybus.i;
+        paso.j           = kybus.j;
+        cola[0]          = paso;
         dibujoElemento.x = -50;
         dibujoElemento.y = -50;
     }
@@ -316,14 +365,131 @@ function move(){
             }
         }
         if((teclado[37] || teclado[39] || teclado[38] || teclado[40]) && mapa[kybus.i][kybus.j].objeto == ''){
-            mapa[kybus.i][kybus.j].obstaculo        = 1;
+            mapa[kybus.i][kybus.j].kybus            = 1;
             mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
             elemento                                = document.getElementById('kybus');
             ruta                                    = elemento.src.split('/');
             imagen                                  = new Image();
             imagen.src                              = ruta[4] + "/" + ruta[5];
             mapa[kybus.i][kybus.j].objeto           = imagen;
+            paso =  {
+                        i : 0,
+                        j : 0
+                    };
+            paso.i = kybus.i;
+            paso.j = kybus.j;
+            pila.push(paso);
         }
+    }
+}
+
+function moveXY(i,j){
+    if(mapa[i][j].objeto == ''){
+        mapa[kybus.i][kybus.j].kybus          = 0;
+        mapa[kybus.i][kybus.j].casa           = 0;
+        mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+        mapa[kybus.i][kybus.j].objeto         = '';
+        kybus.i = i;
+        kybus.j = j;
+        kybus.x = mapa[i][j].x;
+        kybus.y = mapa[i][j].y;
+        mapa[kybus.i][kybus.j].kybus            = 1;
+        mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
+        elemento                                = document.getElementById('kybus');
+        ruta                                    = elemento.src.split('/');
+        imagen                                  = new Image();
+        imagen.src                              = ruta[4] + "/" + ruta[5];
+        mapa[kybus.i][kybus.j].objeto           = imagen;
+    }
+    if(pila.length<=0){
+        paso =  {
+            i : 0,
+            j : 0
+        };
+        paso.i           = i;
+        paso.j           = j;
+        pila[0]          = paso;
+        clearInterval(regreso);
+    }
+}
+
+function amplitud(){
+    if(cola.length <= 0 || llegue == true){
+        paso =  {
+            i : 0,
+            j : 0
+        };
+        paso.i           = kybus.i;
+        paso.j           = kybus.j;
+        cola             = [];
+        cola[0]          = paso;
+        clearInterval(buscando);
+    }
+    mapa[kybus.i][kybus.j].kybus          = 0;
+    mapa[kybus.i][kybus.j].casa           = 0;
+    mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+    mapa[kybus.i][kybus.j].objeto         = '';
+    paso = cola.shift();
+    kybus.i = paso.i;
+    kybus.j = paso.j;
+    kybus.x = mapa[paso.i][paso.j].x;
+    kybus.y = mapa[paso.i][paso.j].y;
+    mapa[kybus.i][kybus.j].kybus            = 1;
+    mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
+    elemento                                = document.getElementById('kybus');
+    ruta                                    = elemento.src.split('/');
+    imagen                                  = new Image();
+    imagen.src                              = ruta[4] + "/" + ruta[5];
+    mapa[kybus.i][kybus.j].objeto           = imagen;
+    visitados[paso.i][paso.j] = true;
+    if(paso.i+1 <= mapa[0].length-1 && mapa[paso.i+1][paso.j].obstaculo == 0 && visitados[paso.i+1][paso.j] == false){
+        if(casa.i == paso.i+1 && casa.j == paso.j) {
+            llegue = true;
+        }
+        console.log("derecha");
+        aux = {
+            i : 0,
+            j : 0
+        };
+        aux.i = paso.i+1;
+        aux.j = paso.j;
+        cola.push(aux);
+    }else if(paso.i-1 >= 0 && mapa[paso.i-1][paso.j].obstaculo == 0 && visitados[paso.i-1][paso.j] == false){
+        if(casa.i == paso.i-1 && casa.j == paso.j) {
+            llegue = true;
+        }
+        console.log("izquierda");
+        aux = {
+            i : 0,
+            j : 0
+        };
+        aux.i = paso.i-1;
+        aux.j = paso.j;
+        cola.push(aux);
+    }else if(paso.j+1 <= mapa.length-1 && mapa[paso.i][paso.j+1].obstaculo == 0 && visitados[paso.i][paso.j+1] == false){
+        if(casa.i == paso.i && casa.j == paso.j+1) {
+            llegue = true;
+        }
+        console.log("abajo");
+        aux = {
+            i : 0,
+            j : 0
+        };
+        aux.i = paso.i;
+        aux.j = paso.j+1;
+        cola.push(aux);
+    }else if(paso.j-1 >= 0 && mapa[paso.i][paso.j-1].obstaculo == 0 && visitados[paso.i][paso.j-1] == false){
+        if(casa.i == paso.i && casa.j == paso.j-1) {
+            llegue = true;
+        }
+        console.log("arriba");
+        aux = {
+            i : 0,
+            j : 0
+        };
+        aux.i = paso.i;
+        aux.j = paso.j-1;
+        cola.push(aux);
     }
 }
 

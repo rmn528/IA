@@ -57,21 +57,21 @@
 						<input type="range" name="rangeInput" min="0" max="80" onmousemove="updateTextInput(this.value);" onclick="updateTextInput(this.value);" id = "dragger1">                                                       	
 					</div>
 					<div class="col-xs-2">
-						<input type="text" id="textInput" value="50" disabled="disabled">	
+						<input type="text" id="textInput" value="40" disabled="disabled">	
 					</div>
 					<div class="col-xs-10">
-						<input type="range" name="rangeInput" min="0" max="10" onmousemove="updateTextInput2(this.value);" onclick="updateTextInput(this.value);" id = "dragger2">                                                       	
+						<input type="range" name="rangeInput" min="1" max="10" onmousemove="updateTextInput2(this.value);" onclick="updateTextInput2(this.value);" id = "dragger2">                                                       	
 					</div>
 					
 					<div class="col-xs-2">
-						<input type="text" id="textInput2" value="5" disabled="disabled">	
+						<input type="text" id="textInput2" value="6" disabled="disabled">	
 					</div>
 				</div>
 
 				<div class="col-xs-1 pull-right">
-					<button class="btn btn-primary col-xs-12">Regresar</button>	
+					<button class="btn btn-primary col-xs-12" id = "regresar">Regresar</button>	
 					<br><br>
-					<button class="btn btn-success col-xs-12">Inicio</button>	
+					<button class="btn btn-success col-xs-12" id = "inicio">Inicio</button>	
 				</div>				
 			</div>
 		</div>
