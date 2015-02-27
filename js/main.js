@@ -470,6 +470,7 @@ function profundidad(){
             buscando = undefined;
             pilaIda = [];
             pilaIda.push({i : kybus.i,j : kybus.j});
+            pila[0] = {i : kybus.i,j : kybus.j};
         }
         mapa[kybus.i][kybus.j].kybus          = 0;
         mapa[kybus.i][kybus.j].casa           = 0;
@@ -528,6 +529,7 @@ function profundidad(){
             console.log("me perdi");
             pilaIda = [];
             pilaIda.push({i : kybus.i,j : kybus.j});
+            pila[0] = {i : kybus.i,j : kybus.j};
             clearInterval(buscando);
             buscando = undefined; 
         }
