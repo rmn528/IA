@@ -1,3 +1,4 @@
+//elementos html
 var canvas         = document.getElementById('mundo');
 var barra          = document.getElementById('barra');
 var rangoDibujar   = document.getElementById('textInput');
@@ -5,11 +6,23 @@ var dragger1       = document.getElementById('dragger1');
 var dragger2       = document.getElementById('dragger2');
 var btnRegresar    = document.getElementById('regresar');
 var btnInicio      = document.getElementById('inicio');
+var pasto          = document.getElementById('pasto');
 
+//contexto
 var ctx            = canvas.getContext('2d');
+
+//alamenamiento de enventos
 var teclado        = {};
 var mouse          = {};
-var dibujoElemento = {};
+
+//elemento auxiliar de dibujo
+var dibujoElemento = {
+                        id: '',
+                        x : -50,
+                        y : -50
+                     };
+
+//objetos del mundo
 var kybus          = {
                         i : 0,
                         j : 0,
@@ -25,29 +38,38 @@ var casa           = {
                         exists : 0
                      };
 var mapa;
+
+//estructuras de datos
 var pila;
-var cola;
+var pilaIda;
+var pilaRegreso;
 var visitados;
+
+//bandera para saber si ya llego a su casa
 var llegue = false;
+
+//cantidad de obstaculos a dibujar
 var cantElementos  = 0;
+
+//setIntervals
 var regreso;
 var buscando;
+
+//velocidad
 var velocidad = 6;
 
 function loadMedia(){
-    pasto     = new Image();
-    pasto.src = 'img/pastoC.jpg';
-    pasto.setAttribute("class", "imagen");
     mapa        = [];
     pila        = [];
-    cola        = [];
+    pilaIda     = [];
+    pilaRegreso = [];
     visitados   = [];
-    for (var i = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, i++) {
+    for (var i = 0,cordY = 0; cordY < canvas.height; cordY += pasto.height, i++) {
         mapa[i]      = [];
         visitados[i] = [];
     }
-    for (var i = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, i++) {
-        for (var j = 0,cordY = 0; cordY < canvas.height; cordY += pasto.height, j++) {
+    for (var i = 0,cordY = 0; cordY < canvas.height; cordY += pasto.height, i++) {
+        for (var j = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, j++) {
             mapa[i][j] = {
                             i : i,
                             j : j,
@@ -62,16 +84,35 @@ function loadMedia(){
             visitados[i][j] = false;
         }
     }
+    for (var i = 0,cordY = 0; i < mapa.length; cordY += pasto.height, i++) {
+        for (var j = 0,cordX = 0; j < mapa[0].length; cordX += pasto.width, j++) {
+            mapa[i][j].i = i;
+            mapa[i][j].j = j;
+            mapa[i][j].x = cordX;
+            mapa[i][j].y = cordY;
+        };
+    };
     pasto.onload = function(){
         var intervalo = window.setInterval(frameLoop,1000/55);
     }
 }
 
+function drawBackground(){
+    for (var i = 0; i < mapa.length; i++) {
+        for (var j = 0; j < mapa[0].length;  j++) {
+            ctx.drawImage(pasto,mapa[i][j].x,mapa[i][j].y);
+        };
+    };
+}
+
 function drawMapElements(){
-    bandera = 1;
-    while(cantElementos){
-        i       = Math.floor((Math.random() * mapa.length) + 0);
-        j       = Math.floor((Math.random() * mapa[0].length) + 0);
+    var bandera = 1;
+    while(cantElementos && buscando == undefined){
+        var i       = Math.floor((Math.random() * mapa.length) + 0);
+        var j       = Math.floor((Math.random() * mapa[0].length) + 0);
+        var elemento = '';
+        var ruta     = '';
+        var imagen   = '';
         if(mapa[i][j].objeto == ''){
             if(bandera){
                 mapa[i][j].tipo_obstaculo   = 'roca';
@@ -82,10 +123,8 @@ function drawMapElements(){
                 elemento                    = document.getElementById('arbol');
                 bandera                     = 1;
             }
-            visitados[i][j]             = true;
             mapa[i][j].obstaculo        = 1;
             mapa[i][j].tipo_obstaculo   = elemento.id;
-            elemento                    = document.getElementById(elemento.id);
             ruta                        = elemento.src.split('/');
             imagen                      = new Image();
             imagen.src                  = ruta[4] + "/" + ruta[5];
@@ -95,16 +134,114 @@ function drawMapElements(){
     }
 }
 
-function drawBackground(){
-    for (var i = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, i++) {
-        for (var j = 0,cordY = 0; cordY < canvas.height; cordY += pasto.height, j++) {
-            mapa[i][j].i = i;
-            mapa[i][j].j = j;
-            mapa[i][j].x = cordX;
-            mapa[i][j].y = cordY;
-            ctx.drawImage(pasto,cordX,cordY);
-        };
-    };
+function isInside(newElement,map){
+    if(newElement.x >= map.x && newElement.x < map.x + pasto.height && newElement.y >= map.y && newElement.y < map.y + pasto.width){
+        return true;
+    }
+    return false;
+}
+
+function NewElement(){
+    if(!jQuery.isEmptyObject(dibujoElemento) && dibujoElemento.x>=0 && dibujoElemento.y>=0 && buscando == undefined){
+        for (var i = 0;i < mapa.length;i++) {
+            for (var j = 0; j < mapa[0].length;j++) {
+                if(isInside(dibujoElemento,mapa[i][j]) && mapa[i][j].objeto == '' && dibujoElemento.id != 'pasto'){
+                    var paso =  {
+                            i : 0,
+                            j : 0
+                        };
+                    var elemento = '';
+                    var ruta     = '';
+                    var imagen   = '';
+                    mapa[i][j].i                = i;
+                    mapa[i][j].j                = j;
+                    if(dibujoElemento.id != 'kybus' && dibujoElemento.id != 'casa'){
+                        mapa[i][j].obstaculo    = 1; 
+                    }else if(dibujoElemento.id == 'kybus'){
+                        if(kybus.exists == 1){
+                            mapa[kybus.i][kybus.j].kybus = 0; 
+                            mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+                            mapa[kybus.i][kybus.j].objeto = '';
+                        }
+                        mapa[i][j].kybus = 1;
+                        kybus.x          = dibujoElemento.x;
+                        kybus.y          = dibujoElemento.y;
+                        kybus.i          = i;
+                        kybus.j          = j;
+                        kybus.exists     = 1;
+                        paso.i           = kybus.i;
+                        paso.j           = kybus.j;
+                        pila[0]          = paso;
+                        visitados = [];
+                        console.log("hola, no deberia estar aqui");
+                        for (var a = 0; a < mapa.length; a++) {
+                            visitados[a] = [];
+                        }
+                        for (var a = 0; a < mapa.length; a++) {
+                            for (var b = 0; b < mapa[0].length; b++) {
+                                visitados[a][b] = false;
+                            }
+                        }
+                        pilaIda = [];
+                        pilaIda[0] = paso; 
+                    }else{
+                        if(casa.exists == 1){
+                            mapa[casa.i][casa.j].casa = 0; 
+                            mapa[casa.i][casa.j].tipo_obstaculo = '';
+                            mapa[casa.i][casa.j].objeto = '';
+                        }
+                        mapa[i][j].casa  = 1;
+                        casa.x           = dibujoElemento.x;
+                        casa.y           = dibujoElemento.y;
+                        casa.i           = i;
+                        casa.j           = j;
+                        casa.exists      = 1;
+                    }
+                    mapa[i][j].tipo_obstaculo   = dibujoElemento.id;
+                    elemento                    = document.getElementById(dibujoElemento.id);
+                    ruta                        = elemento.src.split('/');
+                    imagen                      = new Image();
+                    imagen.src                  = ruta[4] + "/" + ruta[5];
+                    mapa[i][j].objeto           = imagen;
+                }else if(isInside(dibujoElemento,mapa[i][j]) && dibujoElemento.id == 'pasto'){
+                    mapa[i][j].obstaculo = 0;
+                    if(mapa[i][j].kybus == 1){
+                        kybus = {
+                            i : 0,
+                            j : 0,
+                            x : 0,
+                            y : 0,
+                            exists : 0
+                         };
+                    }else if(mapa[i][j].casa == 1){
+                        casa = {
+                            i : 0,
+                            j : 0,
+                            x : 0,
+                            y : 0,
+                            exists : 0
+                         };
+                    }
+                    mapa[i][j].kybus = 0;
+                    mapa[i][j].casa  = 0;
+                    mapa[i][j].tipo_obstaculo = '';
+                    mapa[i][j].objeto = '';
+                }
+            }
+        }
+        dibujoElemento.x = -50;
+        dibujoElemento.y = -50;
+    }
+}
+
+function drawElements(){
+    for (var i = 0;i < mapa.length;i++) {
+        for (var j = 0; j < mapa[0].length;j++) {
+            if(mapa[i][j].objeto != ''){
+                ctx.drawImage(mapa[i][j].objeto,mapa[i][j].x+3,mapa[i][j].y+2,34,32);
+            }
+        }
+    }
 }
 
 function addingEvent(elemento,nombreEvento,funcion){
@@ -128,15 +265,14 @@ function getMousePos(evt) {
 function addingMouseEvents(){
     addingEvent(btnRegresar,'click',function(e){
         regreso = setInterval(function(){
-            paso    = pila.pop();
+            var paso    = pila.pop();
             moveXY(paso.i,paso.j);
         },1000/velocidad);
     });
 
     addingEvent(btnInicio,'click',function(e){
         if(casa.exists && kybus.exists){
-            buscando = setInterval(amplitud,1000/velocidad);
-            console.log(cola);
+            buscando = setInterval(profundidad,1000/velocidad);
         }
     });
 
@@ -147,7 +283,7 @@ function addingMouseEvents(){
 
     addingEvent(canvas,'click',function(e){
         e.preventDefault();
-        posicion              = getMousePos(e);
+        var posicion              = getMousePos(e);
         if(!jQuery.isEmptyObject(dibujoElemento)){
             dibujoElemento.x      = posicion.x -15;
             dibujoElemento.y      = posicion.y -15;
@@ -160,12 +296,10 @@ function addingMouseEvents(){
     });
 
     addingEvent(dragger1,'click',function(e){
-        porcentaje    = dragger1.value;
-        cantElementos = Math.round(porcentaje*270/100);
-        x = mapa.length;
-        y = mapa[0].length;
-        for (var i = 0;i < x;i++) {
-            for (var j = 0; j < y;j++) {
+        var porcentaje    = dragger1.value;
+        cantElementos = Math.round(porcentaje*mapa.length*mapa[0].length/100);
+        for (var i = 0;i < mapa.length;i++) {
+            for (var j = 0; j < mapa[0].length;j++) {
                 if(mapa[i][j].tipo_obstaculo == 'kybus'){
                     if(kybus.exists == 1){
                         mapa[kybus.i][kybus.j].kybus = 0; 
@@ -215,122 +349,9 @@ function addingKeyBoardEvents(){
     });
 }
 
-function isInside(newElement,map){
-    if(newElement.x >= map.x && newElement.x < map.x + 40 && newElement.y >= map.y && newElement.y < map.y + 38){
-        return true;
-    }
-    return false;
-}
-
-function NewElement(){
-    if(!jQuery.isEmptyObject(dibujoElemento)){
-        x = mapa.length;
-        y = mapa[0].length;
-        for (var i = 0;i < x;i++) {
-            for (var j = 0; j < y;j++) {
-                if(isInside(dibujoElemento,mapa[i][j]) && mapa[i][j].objeto == '' && dibujoElemento.id != 'pasto'){
-                    mapa[i][j].i                = i;
-                    mapa[i][j].j                = j;
-                    if(dibujoElemento.id != 'kybus' && dibujoElemento.id != 'casa'){
-                        mapa[i][j].obstaculo    = 1; 
-                    }else if(dibujoElemento.id == 'kybus'){
-                        if(kybus.exists == 1){
-                            mapa[kybus.i][kybus.j].kybus = 0; 
-                            mapa[kybus.i][kybus.j].tipo_obstaculo = '';
-                            mapa[kybus.i][kybus.j].objeto = '';
-                        }
-                        mapa[i][j].kybus = 1;
-                        kybus.x          = dibujoElemento.x;
-                        kybus.y          = dibujoElemento.y;
-                        kybus.i          = i;
-                        kybus.j          = j;
-                        kybus.exists     = 1;
-                        paso =  {
-                            i : 0,
-                            j : 0
-                        };
-                        paso.i           = kybus.i;
-                        paso.j           = kybus.j;
-                        pila[0]          = paso; 
-                        cola[0]          = paso;
-                    }else{
-                        if(casa.exists == 1){
-                            mapa[casa.i][casa.j].casa = 0; 
-                            mapa[casa.i][casa.j].tipo_obstaculo = '';
-                            mapa[casa.i][casa.j].objeto = '';
-                        }
-                        mapa[i][j].casa  = 1;
-                        casa.x           = dibujoElemento.x;
-                        casa.y           = dibujoElemento.y;
-                        casa.i           = i;
-                        casa.j           = j;
-                        casa.exists      = 1;
-                        paso =  {
-                            i : 0,
-                            j : 0
-                        };
-                        paso.i           = kybus.i;
-                        paso.j           = kybus.j;
-                        cola[0]          = paso;
-                    }
-                    mapa[i][j].tipo_obstaculo   = dibujoElemento.id;
-                    elemento                    = document.getElementById(dibujoElemento.id);
-                    ruta                        = elemento.src.split('/');
-                    imagen                      = new Image();
-                    imagen.src                  = ruta[4] + "/" + ruta[5];
-                    mapa[i][j].objeto           = imagen;
-                }else if(isInside(dibujoElemento,mapa[i][j]) && dibujoElemento.id == 'pasto'){
-                    mapa[i][j].obstaculo = 0;
-                    if(mapa[i][j].kybus == 1){
-                        kybus = {
-                            i : 0,
-                            j : 0,
-                            x : 0,
-                            y : 0,
-                            exists : 0
-                         };
-                    }else if(mapa[i][j].casa == 1){
-                        casa = {
-                            i : 0,
-                            j : 0,
-                            x : 0,
-                            y : 0,
-                            exists : 0
-                         };
-                    }
-                    mapa[i][j].kybus = 0;
-                    mapa[i][j].casa  = 0;
-                    mapa[i][j].tipo_obstaculo = '';
-                    mapa[i][j].objeto = '';
-                }
-            }
-        }
-        paso =  {
-            i : 0,
-            j : 0
-        };
-        paso.i           = kybus.i;
-        paso.j           = kybus.j;
-        dibujoElemento.x = -50;
-        dibujoElemento.y = -50;
-    }
-}
-
-function drawElements(){
-    x = mapa.length;
-    y = mapa[0].length;
-    for (var i = 0;i < x;i++) {
-        for (var j = 0; j < y;j++) {
-            if(mapa[i][j].objeto != ''){
-                ctx.drawImage(mapa[i][j].objeto,mapa[i][j].x+5,mapa[i][j].y+3,32,32);
-            }
-        }
-    }
-}
-
 function move(){
     if(kybus.exists == 1){
-        if(teclado[37]){
+        if(teclado[38]){
             if(kybus.i - 1 >=0 && mapa[kybus.i - 1][kybus.j].objeto == ''){
                 mapa[kybus.i][kybus.j].kybus = 0;
                 mapa[kybus.i][kybus.j].casa  = 0;
@@ -340,7 +361,7 @@ function move(){
                 kybus.x = mapa[kybus.i][kybus.j].x;
                 kybus.y = mapa[kybus.i][kybus.j].y;
             }
-        }else if(teclado[39]){
+        }else if(teclado[40]){
             if(kybus.i + 1 <= mapa.length -1 && mapa[kybus.i + 1][kybus.j].objeto == ''){
                 mapa[kybus.i][kybus.j].kybus = 0;
                 mapa[kybus.i][kybus.j].casa  = 0;
@@ -350,7 +371,7 @@ function move(){
                 kybus.x = mapa[kybus.i][kybus.j].x;
                 kybus.y = mapa[kybus.i][kybus.j].y;
             }
-        }else if(teclado[38]){
+        }else if(teclado[37]){
             if(kybus.j - 1 >=0 && mapa[kybus.i][kybus.j - 1].objeto == ''){
                 mapa[kybus.i][kybus.j].kybus = 0;
                 mapa[kybus.i][kybus.j].casa  = 0;
@@ -360,7 +381,7 @@ function move(){
                 kybus.x = mapa[kybus.i][kybus.j].x;
                 kybus.y = mapa[kybus.i][kybus.j].y;
             }
-        }else if(teclado[40]){
+        }else if(teclado[39]){
             if(kybus.j + 1 <= mapa[0].length-1 && mapa[kybus.i][kybus.j + 1].objeto == ''){
                 mapa[kybus.i][kybus.j].kybus = 0;
                 mapa[kybus.i][kybus.j].casa  = 0;
@@ -374,12 +395,12 @@ function move(){
         if((teclado[37] || teclado[39] || teclado[38] || teclado[40]) && mapa[kybus.i][kybus.j].objeto == ''){
             mapa[kybus.i][kybus.j].kybus            = 1;
             mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
-            elemento                                = document.getElementById('kybus');
-            ruta                                    = elemento.src.split('/');
-            imagen                                  = new Image();
+            var elemento                            = document.getElementById('kybus');
+            var ruta                                = elemento.src.split('/');
+            var imagen                              = new Image();
             imagen.src                              = ruta[4] + "/" + ruta[5];
             mapa[kybus.i][kybus.j].objeto           = imagen;
-            paso =  {
+            var paso =  {
                         i : 0,
                         j : 0
                     };
@@ -402,14 +423,14 @@ function moveXY(i,j){
         kybus.y = mapa[i][j].y;
         mapa[kybus.i][kybus.j].kybus            = 1;
         mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
-        elemento                                = document.getElementById('kybus');
-        ruta                                    = elemento.src.split('/');
-        imagen                                  = new Image();
+        var elemento                            = document.getElementById('kybus');
+        var ruta                                = elemento.src.split('/');
+        var imagen                              = new Image();
         imagen.src                              = ruta[4] + "/" + ruta[5];
         mapa[kybus.i][kybus.j].objeto           = imagen;
     }
     if(pila.length<=0){
-        paso =  {
+        var paso =  {
             i : 0,
             j : 0
         };
@@ -420,105 +441,96 @@ function moveXY(i,j){
     }
 }
 
-function amplitud(){
-    if(cola.length <= 0 || llegue == true){
-        paso =  {
-            i : 0,
-            j : 0
-        };
-        paso.i           = kybus.i;
-        paso.j           = kybus.j;
-        cola             = [];
-        cola[0]          = paso;
-        visitados = [];
-        for (var i = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, i++) {
-            visitados[i] = [];
+function profundidad(){
+    var actual;
+    var paso = pilaIda.pop();
+    if(paso != undefined){
+        
+        var x    = paso.i;
+        var y    = paso.j;
+        if(casa.i == x && casa.j == y) {
+            console.log("encontre mi casa");
+            llegue  = true;
+            mapa[kybus.i][kybus.j].kybus          = 0;
+            mapa[kybus.i][kybus.j].casa           = 0;
+            mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+            mapa[kybus.i][kybus.j].objeto         = '';
+            kybus.i = x;
+            kybus.j = y;
+            kybus.x = mapa[x][y].x;
+            kybus.y = mapa[x][y].y;
+            mapa[kybus.i][kybus.j].kybus            = 1;
+            mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
+            var elemento                            = document.getElementById('kybus');
+            var ruta                                = elemento.src.split('/');
+            var imagen                              = new Image();
+            imagen.src                              = ruta[4] + "/" + ruta[5];
+            mapa[kybus.i][kybus.j].objeto           = imagen;
+            clearInterval(buscando);
+            buscando = undefined;
+            pilaIda = [];
+            pilaIda.push({i : kybus.i,j : kybus.j});
         }
-        for (var i = 0,cordX = 0; cordX < canvas.width; cordX += pasto.width, i++) {
-            for (var j = 0,cordY = 0; cordY < canvas.height; cordY += pasto.height, j++) {
-                visitados[i][j] = false;
-            }
+        mapa[kybus.i][kybus.j].kybus          = 0;
+        mapa[kybus.i][kybus.j].casa           = 0;
+        mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+        mapa[kybus.i][kybus.j].objeto         = '';
+        kybus.i = x;
+        kybus.j = y;
+        kybus.x = mapa[x][y].x;
+        kybus.y = mapa[x][y].y;
+        mapa[kybus.i][kybus.j].kybus            = 1;
+        mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
+        var elemento                            = document.getElementById('kybus');
+        var ruta                                = elemento.src.split('/');
+        var imagen                              = new Image();
+        imagen.src                              = ruta[4] + "/" + ruta[5];
+        mapa[kybus.i][kybus.j].objeto           = imagen;
+        visitados[x][y] = true;
+        /*console.log("X+1: "+(x+1)+" Y: "+y+"obstaculo: "+mapa[x+1][y].obstaculo);
+        console.log("X: "+x+" Y+1: "+(y+1)+"obstaculo: "+mapa[x][y+1].obstaculo);
+        console.log("X-1: "+(x-1)+" Y: "+y+"obstaculo: "+mapa[x-1][y].obstaculo);
+        console.log("X: "+x+" Y-1: "+(y-1)+"obstaculo: "+mapa[x][y+1].obstaculo);*/
+        if(x+1 < mapa.length && (mapa[x+1][y].tipo_obstaculo == '' || mapa[x+1][y].tipo_obstaculo == 'casa') && visitados[x+1][y] == false /*&& llegue != true*/){
+            
+            //var actual = pilaIda.length;
+            //while(pilaIda.length == actual){
+                pilaIda.push({i : x+1,j : y});
+            //}
+            //visitados[x+1][y] = true;
         }
-        llegue = false;
-        clearInterval(buscando);
-    }
-    mapa[kybus.i][kybus.j].kybus          = 0;
-    mapa[kybus.i][kybus.j].casa           = 0;
-    mapa[kybus.i][kybus.j].tipo_obstaculo = '';
-    mapa[kybus.i][kybus.j].objeto         = '';
-    var paso = cola.shift();
-    kybus.i = paso.i;
-    kybus.j = paso.j;
-    kybus.x = mapa[paso.i][paso.j].x;
-    kybus.y = mapa[paso.i][paso.j].y;
-    mapa[kybus.i][kybus.j].kybus            = 1;
-    mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
-    elemento                                = document.getElementById('kybus');
-    ruta                                    = elemento.src.split('/');
-    imagen                                  = new Image();
-    imagen.src                              = ruta[4] + "/" + ruta[5];
-    mapa[kybus.i][kybus.j].objeto           = imagen;
-    if(paso.i+1 < mapa[0].length-1 && mapa[paso.i+1][paso.j].obstaculo == 0 && visitados[paso.i+1][paso.j] == false){
-        if((casa.i == paso.i-1 && casa.j == paso.j) || 
-            (casa.i == paso.i+1 && casa.j == paso.j) ||
-            (casa.i == paso.i && casa.j == paso.j-1) ||
-            (casa.i == paso.i && casa.j == paso.j+1)) {
-            llegue = true;
+        if(y+1 < mapa[0].length && (mapa[x][y+1].tipo_obstaculo == '' || mapa[x][y+1].tipo_obstaculo == 'casa') && visitados[x][y+1] == false /*&& llegue != true*/){
+            
+            //var actual = pilaIda.length;
+            //while(pilaIda.length == actual){
+                pilaIda.push({i : x,j : y+1});
+            //}
+            //visitados[x][y+1] = true;
         }
-
-        var aux = {
-            i : 0,
-            j : 0
-        };
-        aux.i = paso.i+1;
-        aux.j = paso.j;
-        cola.push(aux);
-        visitados[paso.i][paso.j] = true;
-    }if(paso.i-1 >= 0 && mapa[paso.i-1][paso.j].obstaculo == 0 && visitados[paso.i-1][paso.j] == false){
-        if((casa.i == paso.i-1 && casa.j == paso.j) || 
-            (casa.i == paso.i+1 && casa.j == paso.j) ||
-            (casa.i == paso.i && casa.j == paso.j-1) ||
-            (casa.i == paso.i && casa.j == paso.j+1)) {
-            llegue = true;
+        if(x-1 >= 0 && (mapa[x-1][y].tipo_obstaculo == '' || mapa[x-1][y].tipo_obstaculo == 'casa') && visitados[x-1][y] == false /*&& llegue != true*/){
+            
+            //var actual = pilaIda.length;
+            //while(pilaIda.length == actual){
+                pilaIda.push({i : x-1,j : y});
+            //}
+            //visitados[x-1][y] = true;
         }
-        aux = {
-            i : 0,
-            j : 0
-        };
-        aux.i = paso.i-1;
-        aux.j = paso.j;
-        cola.push(aux);
-        visitados[paso.i][paso.j] = true;
-    }if(paso.j+1 < mapa[0].length && mapa[paso.i][paso.j+1].obstaculo == 0 && visitados[paso.i][paso.j+1] == false){
-        if((casa.i == paso.i-1 && casa.j == paso.j) || 
-            (casa.i == paso.i+1 && casa.j == paso.j) ||
-            (casa.i == paso.i && casa.j == paso.j-1) ||
-            (casa.i == paso.i && casa.j == paso.j+1)) {
-            llegue = true;
+        if(y-1 >= 0 && (mapa[x][y-1].tipo_obstaculo == '' || mapa[x][y-1].tipo_obstaculo == 'casa') && visitados[x][y-1] == false /*&& llegue != true*/){
+            
+            //var actual = pilaIda.length;
+            //while(pilaIda.length == actual){
+                pilaIda.push({i : x,j : y-1});
+            //}
+            //visitados[x][y-1] = true;
         }
-        aux = {
-            i : 0,
-            j : 0
-        };
-        aux.i = paso.i;
-        aux.j = paso.j+1;
-        cola.push(aux);
-        visitados[paso.i][paso.j] = true;
-    }if(paso.j-1 >= 0 && mapa[paso.i][paso.j-1].obstaculo == 0 && visitados[paso.i][paso.j-1] == false){
-        if((casa.i == paso.i-1 && casa.j == paso.j) || 
-            (casa.i == paso.i+1 && casa.j == paso.j) ||
-            (casa.i == paso.i && casa.j == paso.j-1) ||
-            (casa.i == paso.i && casa.j == paso.j+1)) {
-            llegue = true;
+    }else{
+        if(pilaIda.length<=0){
+            console.log("me perdi");
+            pilaIda = [];
+            pilaIda.push({i : kybus.i,j : kybus.j});
+            clearInterval(buscando);
+            buscando = undefined; 
         }
-        aux = {
-            i : 0,
-            j : 0
-        };
-        aux.i = paso.i;
-        aux.j = paso.j-1;
-        cola.push(aux);
-        visitados[paso.i][paso.j] = true;
     }
 }
 
@@ -528,6 +540,7 @@ function frameLoop(){
     NewElement();
     drawElements();
 }
+
 
 addingKeyBoardEvents();
 addingMouseEvents();
