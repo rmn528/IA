@@ -28,7 +28,9 @@ var kybus          = {
                         j : 0,
                         x : 0,
                         y : 0,
-                        exists : 0
+                        exists : 0,
+                        p : 0,
+                        iterador : 0
                      };
 var casa           = {
                         i : 0,
@@ -173,7 +175,6 @@ function NewElement(){
                         paso.j           = kybus.j;
                         pila[0]          = paso;
                         visitados = [];
-                        console.log("hola, no deberia estar aqui");
                         for (var a = 0; a < mapa.length; a++) {
                             visitados[a] = [];
                         }
@@ -211,7 +212,9 @@ function NewElement(){
                             j : 0,
                             x : 0,
                             y : 0,
-                            exists : 0
+                            exists : 0,
+                            p : 0,
+                            iterador : 0
                          };
                     }else if(mapa[i][j].casa == 1){
                         casa = {
@@ -272,7 +275,30 @@ function addingMouseEvents(){
 
     addingEvent(btnInicio,'click',function(e){
         if(casa.exists && kybus.exists){
-            buscando = setInterval(profundidad,1000/velocidad);
+            kybus.dX = Math.abs(casa.i-kybus.i);
+            kybus.dY = Math.abs(casa.j-kybus.j);
+            if(casa.i > kybus.i){
+                kybus.incrementoX = 1;
+            }else if(casa.i == kybus.i){
+                kybus.incrementoX = 0;
+            }else{
+                kybus.incrementoX = -1;
+            }
+            if(kybus.j < casa.j){
+                kybus.incrementoY = 1;
+            }else if(casa.j == kybus.j){
+                kybus.incrementoY = 0;
+            }else{
+                kybus.incrementoY = -1;
+            }
+            if(kybus.dX > kybus.dY){
+                kybus.p        = 2*kybus.dY-kybus.dX;
+                kybus.iterador = kybus.dX;
+            }else{
+                kybus.p        = 2*kybus.dX-kybus.dY;
+                kybus.iterador = kybus.dY;
+            }
+            buscando = setInterval(lineaBres,1000/velocidad);
         }
     });
 
@@ -311,7 +337,9 @@ function addingMouseEvents(){
                         j : 0,
                         x : 0,
                         y : 0,
-                        exists : 0
+                        exists : 0,
+                        p : 0,
+                        iterador : 0
                     };
                 }else if(mapa[i][j].tipo_obstaculo == 'casa'){
                     if(casa.exists == 1){
@@ -441,6 +469,64 @@ function moveXY(i,j){
     }
 }
 
+function lineaBres(){
+    if(kybus.dX > kybus.dY){
+        if(kybus.iterador){
+            mapa[kybus.i][kybus.j].kybus          = 0;
+            mapa[kybus.i][kybus.j].casa           = 0;
+            mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+            mapa[kybus.i][kybus.j].objeto         = '';
+            kybus.i+= kybus.incrementoX;
+            if(kybus.p<0){
+                kybus.p+= 2*kybus.dY;
+            }else{
+                kybus.p+= 2*kybus.dY-2*kybus.dX;
+                kybus.j+= kybus.incrementoY;
+            }
+            kybus.x = mapa[kybus.i][kybus.j].x;
+            kybus.y = mapa[kybus.i][kybus.j].y;
+            mapa[kybus.i][kybus.j].kybus            = 1;
+            mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
+            var elemento                            = document.getElementById('kybus');
+            var ruta                                = elemento.src.split('/');
+            var imagen                              = new Image();
+            imagen.src                              = ruta[4] + "/" + ruta[5];
+            mapa[kybus.i][kybus.j].objeto           = imagen;
+            kybus.iterador--;
+        }else{
+            clearInterval(buscando);
+            buscando = undefined;
+        }
+    }else{
+        if(kybus.iterador){
+            mapa[kybus.i][kybus.j].kybus          = 0;
+            mapa[kybus.i][kybus.j].casa           = 0;
+            mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+            mapa[kybus.i][kybus.j].objeto         = '';
+            kybus.j+= kybus.incrementoY;
+            if(kybus.p < 0){
+                kybus.p+= 2*kybus.dX;
+            }else{
+                kybus.p+= 2*kybus.dX-2*kybus.dY;
+                kybus.i+= kybus.incrementoX;
+            }
+            kybus.x = mapa[kybus.i][kybus.j].x;
+            kybus.y = mapa[kybus.i][kybus.j].y;
+            mapa[kybus.i][kybus.j].kybus            = 1;
+            mapa[kybus.i][kybus.j].tipo_obstaculo   = 'kybus';
+            var elemento                            = document.getElementById('kybus');
+            var ruta                                = elemento.src.split('/');
+            var imagen                              = new Image();
+            imagen.src                              = ruta[4] + "/" + ruta[5];
+            mapa[kybus.i][kybus.j].objeto           = imagen;
+            kybus.iterador--;
+        }else{
+            clearInterval(buscando);
+            buscando = undefined;
+        }
+    }
+}
+
 function profundidad(){
     var actual;
     var paso = pilaIda.pop();
@@ -449,7 +535,6 @@ function profundidad(){
         var x    = paso.i;
         var y    = paso.j;
         if(casa.i == x && casa.j == y) {
-            console.log("encontre mi casa");
             llegue  = true;
             mapa[kybus.i][kybus.j].kybus          = 0;
             mapa[kybus.i][kybus.j].casa           = 0;
@@ -488,45 +573,20 @@ function profundidad(){
         imagen.src                              = ruta[4] + "/" + ruta[5];
         mapa[kybus.i][kybus.j].objeto           = imagen;
         visitados[x][y] = true;
-        /*console.log("X+1: "+(x+1)+" Y: "+y+"obstaculo: "+mapa[x+1][y].obstaculo);
-        console.log("X: "+x+" Y+1: "+(y+1)+"obstaculo: "+mapa[x][y+1].obstaculo);
-        console.log("X-1: "+(x-1)+" Y: "+y+"obstaculo: "+mapa[x-1][y].obstaculo);
-        console.log("X: "+x+" Y-1: "+(y-1)+"obstaculo: "+mapa[x][y+1].obstaculo);*/
-        if(x+1 < mapa.length && (mapa[x+1][y].tipo_obstaculo == '' || mapa[x+1][y].tipo_obstaculo == 'casa') && visitados[x+1][y] == false /*&& llegue != true*/){
-            
-            //var actual = pilaIda.length;
-            //while(pilaIda.length == actual){
-                pilaIda.push({i : x+1,j : y});
-            //}
-            //visitados[x+1][y] = true;
+        if(x+1 < mapa.length && (mapa[x+1][y].tipo_obstaculo == '' || mapa[x+1][y].tipo_obstaculo == 'casa') && visitados[x+1][y] == false){
+            pilaIda.push({i : x+1,j : y});
         }
-        if(y+1 < mapa[0].length && (mapa[x][y+1].tipo_obstaculo == '' || mapa[x][y+1].tipo_obstaculo == 'casa') && visitados[x][y+1] == false /*&& llegue != true*/){
-            
-            //var actual = pilaIda.length;
-            //while(pilaIda.length == actual){
-                pilaIda.push({i : x,j : y+1});
-            //}
-            //visitados[x][y+1] = true;
+        if(y+1 < mapa[0].length && (mapa[x][y+1].tipo_obstaculo == '' || mapa[x][y+1].tipo_obstaculo == 'casa') && visitados[x][y+1] == false){
+            pilaIda.push({i : x,j : y+1});
         }
-        if(x-1 >= 0 && (mapa[x-1][y].tipo_obstaculo == '' || mapa[x-1][y].tipo_obstaculo == 'casa') && visitados[x-1][y] == false /*&& llegue != true*/){
-            
-            //var actual = pilaIda.length;
-            //while(pilaIda.length == actual){
-                pilaIda.push({i : x-1,j : y});
-            //}
-            //visitados[x-1][y] = true;
+        if(x-1 >= 0 && (mapa[x-1][y].tipo_obstaculo == '' || mapa[x-1][y].tipo_obstaculo == 'casa') && visitados[x-1][y] == false){
+            pilaIda.push({i : x-1,j : y});
         }
-        if(y-1 >= 0 && (mapa[x][y-1].tipo_obstaculo == '' || mapa[x][y-1].tipo_obstaculo == 'casa') && visitados[x][y-1] == false /*&& llegue != true*/){
-            
-            //var actual = pilaIda.length;
-            //while(pilaIda.length == actual){
-                pilaIda.push({i : x,j : y-1});
-            //}
-            //visitados[x][y-1] = true;
+        if(y-1 >= 0 && (mapa[x][y-1].tipo_obstaculo == '' || mapa[x][y-1].tipo_obstaculo == 'casa') && visitados[x][y-1] == false){
+            pilaIda.push({i : x,j : y-1});
         }
     }else{
         if(pilaIda.length<=0){
-            console.log("me perdi");
             pilaIda = [];
             pilaIda.push({i : kybus.i,j : kybus.j});
             pila[0] = {i : kybus.i,j : kybus.j};
