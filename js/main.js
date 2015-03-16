@@ -501,8 +501,7 @@ function eightDirections(cordenadaU, cordenadaA, cordenadaS, bandera){
         cordenadaS.i = cordenadaA.i-1;
         cordenadaS.j = cordenadaA.j-1;
         
-    }
-    if(cordenadaA.i-1 >= 0 &&
+    }else if(cordenadaA.i-1 >= 0 &&
     (mapa[cordenadaA.i-1][cordenadaA.j].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i-1][cordenadaA.j].objeto_alpha != '' 
         && mapa[cordenadaA.i-1][cordenadaA.j].alpha < 10)) &&
@@ -510,8 +509,7 @@ function eightDirections(cordenadaU, cordenadaA, cordenadaS, bandera){
         cordenadaS.i = cordenadaA.i-1;
         cordenadaS.j = cordenadaA.j; 
         
-    }
-    if(cordenadaA.i-1 >= 0 && cordenadaA.j+1 < mapa[0].length &&
+    }else if(cordenadaA.i-1 >= 0 && cordenadaA.j+1 < mapa[0].length &&
     (mapa[cordenadaA.i-1][cordenadaA.j+1].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i-1][cordenadaA.j+1].objeto_alpha != '' 
         && mapa[cordenadaA.i-1][cordenadaA.j+1].alpha < 10)) &&
@@ -519,8 +517,7 @@ function eightDirections(cordenadaU, cordenadaA, cordenadaS, bandera){
         cordenadaS.i = cordenadaA.i-1;
         cordenadaS.j = cordenadaA.j+1; 
         
-    }
-    if(cordenadaA.j+1 < mapa[0].length &&
+    }else if(cordenadaA.j+1 < mapa[0].length &&
     (mapa[cordenadaA.i][cordenadaA.j+1].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i][cordenadaA.j+1].objeto_alpha != '' 
         && mapa[cordenadaA.i][cordenadaA.j+1].alpha < 10)) &&
@@ -528,8 +525,7 @@ function eightDirections(cordenadaU, cordenadaA, cordenadaS, bandera){
         cordenadaS.i = cordenadaA.i;
         cordenadaS.j = cordenadaA.j+1; 
         
-    }
-    if(cordenadaA.i+1 < mapa.length && cordenadaA.j+1 < mapa[0].length &&
+    }else if(cordenadaA.i+1 < mapa.length && cordenadaA.j+1 < mapa[0].length &&
     (mapa[cordenadaA.i+1][cordenadaA.j+1].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i+1][cordenadaA.j+1].objeto_alpha != '' 
         && mapa[cordenadaA.i+1][cordenadaA.j+1].alpha < 10)) &&
@@ -537,24 +533,21 @@ function eightDirections(cordenadaU, cordenadaA, cordenadaS, bandera){
         cordenadaS.i = cordenadaA.i+1;
         cordenadaS.j = cordenadaA.j+1; 
         
-    }
-    if(cordenadaA.i+1 < mapa.length && 
+    }else if(cordenadaA.i+1 < mapa.length && 
     (mapa[cordenadaA.i+1][cordenadaA.j].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i+1][cordenadaA.j].objeto_alpha != '' 
         && mapa[cordenadaA.i+1][cordenadaA.j].alpha < 10)) &&
     !(cordenadaA.i+1 == cordenadaU.i && cordenadaA.j == cordenadaU.j)){
         cordenadaS.i = cordenadaA.i+1;
         cordenadaS.j = cordenadaA.j; 
-    }
-    if(cordenadaA.i+1 < mapa.length && cordenadaA.j-1 >= 0 && 
+    }else if(cordenadaA.i+1 < mapa.length && cordenadaA.j-1 >= 0 && 
     (mapa[cordenadaA.i+1][cordenadaA.j-1].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i+1][cordenadaA.j-1].objeto_alpha != '' 
         && mapa[cordenadaA.i+1][cordenadaA.j-1].alpha < 10)) &&
     !(cordenadaA.i+1 == cordenadaU.i && cordenadaA.j-1 == cordenadaU.j)){
         cordenadaS.i = cordenadaA.i+1;
         cordenadaS.j = cordenadaA.j-1; 
-    }
-    if(cordenadaA.j-1 >= 0 &&
+    }else if(cordenadaA.j-1 >= 0 &&
     (mapa[cordenadaA.i][cordenadaA.j-1].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i][cordenadaA.j-1].objeto_alpha != '' 
         && mapa[cordenadaA.i][cordenadaA.j-1].alpha < 10)) &&
@@ -574,54 +567,47 @@ function libre(cordenadaA){
         cordenadaS.i = cordenadaA.i-1;
         cordenadaS.j = cordenadaA.j-1;
         
-    }
-    if(cordenadaA.i-1 >= 0 &&
+    }else if(cordenadaA.i-1 >= 0 &&
     (mapa[cordenadaA.i-1][cordenadaA.j].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i-1][cordenadaA.j].objeto_alpha != '' 
         && mapa[cordenadaA.i-1][cordenadaA.j].alpha < 10))){
         cordenadaS.i = cordenadaA.i-1;
         cordenadaS.j = cordenadaA.j; 
         
-    }
-    if(cordenadaA.i-1 >= 0 && cordenadaA.j+1 < mapa[0].length &&
+    }else if(cordenadaA.i-1 >= 0 && cordenadaA.j+1 < mapa[0].length &&
     (mapa[cordenadaA.i-1][cordenadaA.j+1].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i-1][cordenadaA.j+1].objeto_alpha != '' 
         && mapa[cordenadaA.i-1][cordenadaA.j+1].alpha < 10))){
         cordenadaS.i = cordenadaA.i-1;
         cordenadaS.j = cordenadaA.j+1; 
         
-    }
-    if(cordenadaA.j+1 < mapa[0].length &&
+    }else if(cordenadaA.j+1 < mapa[0].length &&
     (mapa[cordenadaA.i][cordenadaA.j+1].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i][cordenadaA.j+1].objeto_alpha != '' 
         && mapa[cordenadaA.i][cordenadaA.j+1].alpha < 10))){
         cordenadaS.i = cordenadaA.i;
         cordenadaS.j = cordenadaA.j+1; 
         
-    }
-    if(cordenadaA.i+1 < mapa.length && cordenadaA.j+1 < mapa[0].length &&
+    }else if(cordenadaA.i+1 < mapa.length && cordenadaA.j+1 < mapa[0].length &&
     (mapa[cordenadaA.i+1][cordenadaA.j+1].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i+1][cordenadaA.j+1].objeto_alpha != '' 
         && mapa[cordenadaA.i+1][cordenadaA.j+1].alpha < 10))){
         cordenadaS.i = cordenadaA.i+1;
         cordenadaS.j = cordenadaA.j+1; 
         
-    }
-    if(cordenadaA.i+1 < mapa.length && 
+    }else if(cordenadaA.i+1 < mapa.length && 
     (mapa[cordenadaA.i+1][cordenadaA.j].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i+1][cordenadaA.j].objeto_alpha != '' 
         && mapa[cordenadaA.i+1][cordenadaA.j].alpha < 10))){
         cordenadaS.i = cordenadaA.i+1;
         cordenadaS.j = cordenadaA.j; 
-    }
-    if(cordenadaA.i+1 < mapa.length && cordenadaA.j-1 >= 0 && 
+    }else if(cordenadaA.i+1 < mapa.length && cordenadaA.j-1 >= 0 && 
     (mapa[cordenadaA.i+1][cordenadaA.j-1].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i+1][cordenadaA.j-1].objeto_alpha != '' 
         && mapa[cordenadaA.i+1][cordenadaA.j-1].alpha < 10))){
         cordenadaS.i = cordenadaA.i+1;
         cordenadaS.j = cordenadaA.j-1; 
-    }
-    if(cordenadaA.j-1 >= 0 &&
+    }else if(cordenadaA.j-1 >= 0 &&
     (mapa[cordenadaA.i][cordenadaA.j-1].tipo_obstaculo == '' || 
     (mapa[cordenadaA.i][cordenadaA.j-1].objeto_alpha != '' 
         && mapa[cordenadaA.i][cordenadaA.j-1].alpha < 10))){
@@ -659,10 +645,13 @@ function lineaBres(){
                         cordenada.i = auxUlt.i;
                         cordenada.j = auxUlt.j;
                     }else{
-                        cordenada.i = kybus.lastI;
-                        cordenada.j = kybus.lastJ;
-                        clearInterval(buscando);
-                        buscando = undefined;
+                        cordenada = libre({i : kybus.lastI, j: kybus.lastJ});
+                        if(cordenada.i == kybus.lastI && cordenada.j == kybus.lastJ){
+                            cordenada.i = kybus.lastI;
+                            cordenada.j = kybus.lastJ;
+                            clearInterval(buscando);
+                            buscando = undefined;
+                        }
                     }
                 }
                 kybus.i = cordenada.i;
@@ -748,10 +737,13 @@ function lineaBres(){
                         cordenada.i = auxUlt.i;
                         cordenada.j = auxUlt.j;
                     }else{
-                        cordenada.i = kybus.lastI;
-                        cordenada.j = kybus.lastJ;
-                        clearInterval(buscando);
-                        buscando = undefined;
+                        cordenada = libre({i : kybus.lastI, j: kybus.lastJ});
+                        if(cordenada.i == kybus.lastI && cordenada.j == kybus.lastJ){
+                            cordenada.i = kybus.lastI;
+                            cordenada.j = kybus.lastJ;
+                            clearInterval(buscando);
+                            buscando = undefined;
+                        }
                     }
                 }
                 kybus.i = cordenada.i;
