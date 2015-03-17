@@ -129,6 +129,7 @@ function drawMapElements(){
                 elemento                    = document.getElementById('arbol');
                 bandera                     = 1;
             }
+            mapa[i][j].alpha            = 12;
             mapa[i][j].obstaculo        = 1;
             mapa[i][j].tipo_obstaculo   = elemento.id;
             ruta                        = elemento.src.split('/');
@@ -204,7 +205,7 @@ function NewElement(){
                         casa.j           = j;
                         casa.exists      = 1;
                     }
-                    mapa[i][j].obstaculo        = 1;
+                    mapa[i][j].alpha            = 12;
                     mapa[i][j].tipo_obstaculo   = dibujoElemento.id;
                     elemento                    = document.getElementById(dibujoElemento.id);
                     ruta                        = elemento.src.split('/');
@@ -234,6 +235,7 @@ function NewElement(){
                             exists : 0
                          };
                     }
+                    mapa[i][j].alpha = 0;
                     mapa[i][j].kybus = 0;
                     mapa[i][j].casa  = 0;
                     mapa[i][j].tipo_obstaculo = '';
@@ -311,11 +313,6 @@ function addingMouseEvents(){
                 kybus.p        = 2*kybus.dX-kybus.dY;
                 kybus.iterador = kybus.dY;
             }
-            for (var i = 0; i < mapa.length; i++) {
-                for (var j = 0; j < mapa[0].length;  j++) {
-                    mapa[i][j].alpha = 0;
-                };
-            };
             buscando = setInterval(lineaBres,1000/velocidad);
         }
     });
@@ -380,6 +377,7 @@ function addingMouseEvents(){
                 mapa[i][j].kybus = 0;
                 mapa[i][j].casa  = 0;
                 mapa[i][j].tipo_obstaculo = '';
+                mapa[i][j].alpha          = 0;
                 mapa[i][j].objeto = '';
                 mapa[i][j].objeto_alpha = '';
             }
@@ -493,132 +491,89 @@ function moveXY(i,j){
 }
 
 function eightDirections(cordenadaU, cordenadaA, cordenadaS, bandera){
-    if(cordenadaA.i-1 >= 0 && cordenadaA.j-1 >= 0 && 
-    (mapa[cordenadaA.i-1][cordenadaA.j-1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i-1][cordenadaA.j-1].objeto_alpha != '' 
-        && mapa[cordenadaA.i-1][cordenadaA.j-1].alpha < 10)) &&
-    !(cordenadaA.i-1 == cordenadaU.i && cordenadaA.j-1 == cordenadaU.j)){
-        cordenadaS.i = cordenadaA.i-1;
-        cordenadaS.j = cordenadaA.j-1;
-        
-    }else if(cordenadaA.i-1 >= 0 &&
-    (mapa[cordenadaA.i-1][cordenadaA.j].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i-1][cordenadaA.j].objeto_alpha != '' 
-        && mapa[cordenadaA.i-1][cordenadaA.j].alpha < 10)) &&
-    !(cordenadaA.i-1 == cordenadaU.i && cordenadaA.j == cordenadaU.j)){
+    if(cordenadaA.i-1 >= 0 && mapa[cordenadaA.i-1][cordenadaA.j].alpha < 10 &&
+    !(cordenadaA.i-1 == cordenadaU.i && cordenadaA.j == cordenadaU.j)) {
         cordenadaS.i = cordenadaA.i-1;
         cordenadaS.j = cordenadaA.j; 
         
-    }else if(cordenadaA.i-1 >= 0 && cordenadaA.j+1 < mapa[0].length &&
-    (mapa[cordenadaA.i-1][cordenadaA.j+1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i-1][cordenadaA.j+1].objeto_alpha != '' 
-        && mapa[cordenadaA.i-1][cordenadaA.j+1].alpha < 10)) &&
-    !(cordenadaA.i-1 == cordenadaU.i && cordenadaA.j+1 == cordenadaU.j)){
-        cordenadaS.i = cordenadaA.i-1;
-        cordenadaS.j = cordenadaA.j+1; 
-        
-    }else if(cordenadaA.j+1 < mapa[0].length &&
-    (mapa[cordenadaA.i][cordenadaA.j+1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i][cordenadaA.j+1].objeto_alpha != '' 
-        && mapa[cordenadaA.i][cordenadaA.j+1].alpha < 10)) &&
-    !(cordenadaA.i == cordenadaU.i && cordenadaA.j+1 == cordenadaU.j)){
+    }else if(cordenadaA.j+1 < mapa[0].length && mapa[cordenadaA.i][cordenadaA.j+1].alpha < 10 &&
+    !(cordenadaA.i == cordenadaU.i && cordenadaA.j+1 == cordenadaU.j)) {
         cordenadaS.i = cordenadaA.i;
         cordenadaS.j = cordenadaA.j+1; 
         
-    }else if(cordenadaA.i+1 < mapa.length && cordenadaA.j+1 < mapa[0].length &&
-    (mapa[cordenadaA.i+1][cordenadaA.j+1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i+1][cordenadaA.j+1].objeto_alpha != '' 
-        && mapa[cordenadaA.i+1][cordenadaA.j+1].alpha < 10)) &&
-    !(cordenadaA.i+1 == cordenadaU.i && cordenadaA.j+1 == cordenadaU.j)){
+    }else if(cordenadaA.i+1 < mapa.length && mapa[cordenadaA.i+1][cordenadaA.j].alpha < 10 &&
+    !(cordenadaA.i+1 == cordenadaU.i && cordenadaA.j == cordenadaU.j)) {
+        cordenadaS.i = cordenadaA.i+1;
+        cordenadaS.j = cordenadaA.j; 
+    }else if(cordenadaA.j-1 >= 0 && mapa[cordenadaA.i][cordenadaA.j-1].alpha < 10 &&
+    !(cordenadaA.i == cordenadaU.i && cordenadaA.j-1 == cordenadaU.j)) {
+        cordenadaS.i = cordenadaA.i;
+        cordenadaS.j = cordenadaA.j-1;
+    }else if(cordenadaA.i-1 >= 0 && cordenadaA.j-1 >= 0 && mapa[cordenadaA.i-1][cordenadaA.j-1].alpha < 10 &&
+    !(cordenadaA.i-1 == cordenadaU.i && cordenadaA.j-1 == cordenadaU.j)) {
+        cordenadaS.i = cordenadaA.i-1;
+        cordenadaS.j = cordenadaA.j-1;
+        
+    }else if(cordenadaA.i-1 >= 0 && cordenadaA.j+1 < mapa[0].length && 
+        mapa[cordenadaA.i-1][cordenadaA.j+1].alpha < 10 &&
+    !(cordenadaA.i-1 == cordenadaU.i && cordenadaA.j+1 == cordenadaU.j)) {
+        cordenadaS.i = cordenadaA.i-1;
+        cordenadaS.j = cordenadaA.j+1; 
+        
+    }else if(cordenadaA.i+1 < mapa.length && cordenadaA.j+1 < mapa[0].length && 
+        mapa[cordenadaA.i+1][cordenadaA.j+1].alpha < 10 &&
+    !(cordenadaA.i+1 == cordenadaU.i && cordenadaA.j+1 == cordenadaU.j)) {
         cordenadaS.i = cordenadaA.i+1;
         cordenadaS.j = cordenadaA.j+1; 
         
-    }else if(cordenadaA.i+1 < mapa.length && 
-    (mapa[cordenadaA.i+1][cordenadaA.j].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i+1][cordenadaA.j].objeto_alpha != '' 
-        && mapa[cordenadaA.i+1][cordenadaA.j].alpha < 10)) &&
-    !(cordenadaA.i+1 == cordenadaU.i && cordenadaA.j == cordenadaU.j)){
-        cordenadaS.i = cordenadaA.i+1;
-        cordenadaS.j = cordenadaA.j; 
     }else if(cordenadaA.i+1 < mapa.length && cordenadaA.j-1 >= 0 && 
-    (mapa[cordenadaA.i+1][cordenadaA.j-1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i+1][cordenadaA.j-1].objeto_alpha != '' 
-        && mapa[cordenadaA.i+1][cordenadaA.j-1].alpha < 10)) &&
-    !(cordenadaA.i+1 == cordenadaU.i && cordenadaA.j-1 == cordenadaU.j)){
+        mapa[cordenadaA.i+1][cordenadaA.j-1].alpha < 10 &&
+    !(cordenadaA.i+1 == cordenadaU.i && cordenadaA.j-1 == cordenadaU.j)) {
         cordenadaS.i = cordenadaA.i+1;
         cordenadaS.j = cordenadaA.j-1; 
-    }else if(cordenadaA.j-1 >= 0 &&
-    (mapa[cordenadaA.i][cordenadaA.j-1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i][cordenadaA.j-1].objeto_alpha != '' 
-        && mapa[cordenadaA.i][cordenadaA.j-1].alpha < 10)) &&
-    !(cordenadaA.i == cordenadaU.i && cordenadaA.j-1 == cordenadaU.j)){
-        cordenadaS.i = cordenadaA.i;
-        cordenadaS.j = cordenadaA.j-1;
     }
     return cordenadaS;
 }
 
 function libre(cordenadaA){
     cordenadaS = cordenadaA;
-    if(cordenadaA.i-1 >= 0 && cordenadaA.j-1 >= 0 && 
-    (mapa[cordenadaA.i-1][cordenadaA.j-1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i-1][cordenadaA.j-1].objeto_alpha != '' 
-        && mapa[cordenadaA.i-1][cordenadaA.j-1].alpha < 10))){
-        cordenadaS.i = cordenadaA.i-1;
-        cordenadaS.j = cordenadaA.j-1;
-        
-    }else if(cordenadaA.i-1 >= 0 &&
-    (mapa[cordenadaA.i-1][cordenadaA.j].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i-1][cordenadaA.j].objeto_alpha != '' 
-        && mapa[cordenadaA.i-1][cordenadaA.j].alpha < 10))){
+    if(cordenadaA.i-1 >= 0 && mapa[cordenadaA.i-1][cordenadaA.j].alpha < 10) {
         cordenadaS.i = cordenadaA.i-1;
         cordenadaS.j = cordenadaA.j; 
         
-    }else if(cordenadaA.i-1 >= 0 && cordenadaA.j+1 < mapa[0].length &&
-    (mapa[cordenadaA.i-1][cordenadaA.j+1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i-1][cordenadaA.j+1].objeto_alpha != '' 
-        && mapa[cordenadaA.i-1][cordenadaA.j+1].alpha < 10))){
-        cordenadaS.i = cordenadaA.i-1;
-        cordenadaS.j = cordenadaA.j+1; 
-        
-    }else if(cordenadaA.j+1 < mapa[0].length &&
-    (mapa[cordenadaA.i][cordenadaA.j+1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i][cordenadaA.j+1].objeto_alpha != '' 
-        && mapa[cordenadaA.i][cordenadaA.j+1].alpha < 10))){
+    }else if(cordenadaA.j+1 < mapa[0].length && mapa[cordenadaA.i][cordenadaA.j+1].alpha < 10) {
         cordenadaS.i = cordenadaA.i;
         cordenadaS.j = cordenadaA.j+1; 
         
-    }else if(cordenadaA.i+1 < mapa.length && cordenadaA.j+1 < mapa[0].length &&
-    (mapa[cordenadaA.i+1][cordenadaA.j+1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i+1][cordenadaA.j+1].objeto_alpha != '' 
-        && mapa[cordenadaA.i+1][cordenadaA.j+1].alpha < 10))){
+    }else if(cordenadaA.i+1 < mapa.length && mapa[cordenadaA.i+1][cordenadaA.j].alpha < 10) {
+        cordenadaS.i = cordenadaA.i+1;
+        cordenadaS.j = cordenadaA.j; 
+    }else if(cordenadaA.j-1 >= 0 && mapa[cordenadaA.i][cordenadaA.j-1].alpha < 10) {
+        cordenadaS.i = cordenadaA.i;
+        cordenadaS.j = cordenadaA.j-1;
+    }else if(cordenadaA.i-1 >= 0 && cordenadaA.j-1 >= 0 && mapa[cordenadaA.i-1][cordenadaA.j-1].alpha < 10) {
+        cordenadaS.i = cordenadaA.i-1;
+        cordenadaS.j = cordenadaA.j-1;
+        
+    }else if(cordenadaA.i-1 >= 0 && cordenadaA.j+1 < mapa[0].length && 
+        mapa[cordenadaA.i-1][cordenadaA.j+1].alpha < 10) {
+        cordenadaS.i = cordenadaA.i-1;
+        cordenadaS.j = cordenadaA.j+1; 
+        
+    }else if(cordenadaA.i+1 < mapa.length && cordenadaA.j+1 < mapa[0].length && 
+        mapa[cordenadaA.i+1][cordenadaA.j+1].alpha < 10) {
         cordenadaS.i = cordenadaA.i+1;
         cordenadaS.j = cordenadaA.j+1; 
         
-    }else if(cordenadaA.i+1 < mapa.length && 
-    (mapa[cordenadaA.i+1][cordenadaA.j].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i+1][cordenadaA.j].objeto_alpha != '' 
-        && mapa[cordenadaA.i+1][cordenadaA.j].alpha < 10))){
-        cordenadaS.i = cordenadaA.i+1;
-        cordenadaS.j = cordenadaA.j; 
     }else if(cordenadaA.i+1 < mapa.length && cordenadaA.j-1 >= 0 && 
-    (mapa[cordenadaA.i+1][cordenadaA.j-1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i+1][cordenadaA.j-1].objeto_alpha != '' 
-        && mapa[cordenadaA.i+1][cordenadaA.j-1].alpha < 10))){
+        mapa[cordenadaA.i+1][cordenadaA.j-1].alpha < 10) {
         cordenadaS.i = cordenadaA.i+1;
         cordenadaS.j = cordenadaA.j-1; 
-    }else if(cordenadaA.j-1 >= 0 &&
-    (mapa[cordenadaA.i][cordenadaA.j-1].tipo_obstaculo == '' || 
-    (mapa[cordenadaA.i][cordenadaA.j-1].objeto_alpha != '' 
-        && mapa[cordenadaA.i][cordenadaA.j-1].alpha < 10))){
-        cordenadaS.i = cordenadaA.i;
-        cordenadaS.j = cordenadaA.j-1;
     }
     return cordenadaS;
 }
 
 function lineaBres(){
-    var aux = {i : 0,j : 0};
     var auxUlt = {i : 0,j : 0};
     auxUlt.i = kybus.lastI;
     auxUlt.j = kybus.lastJ;
@@ -633,15 +588,34 @@ function lineaBres(){
                 kybus.p+= 2*kybus.dY-2*kybus.dX;
                 kybus.j+= kybus.incrementoY;
             }
-            if(mapa[kybus.i][kybus.j].tipo_obstaculo != '' || 
-                (mapa[kybus.i][kybus.j].alpha >=10 && mapa[kybus.i][kybus.j].objeto_alpha != '')){
-                aux.i = kybus.i;
-                aux.j = kybus.j;
+            
+            if(mapa[kybus.i][kybus.j].alpha >=10){
+                
+                
+                
+                if(mapa[kybus.lastI][kybus.lastJ].objeto_alpha == ''){
+                    var elemento = '';
+                    var ruta     = '';
+                    var imagen   = '';
+                    elemento                                        = document.getElementById('arbol');
+                    mapa[kybus.lastI][kybus.lastJ].alpha            = 1;
+                    ruta                                            = elemento.src.split('/');
+                    imagen                                          = new Image();
+                    imagen.src                                      = ruta[4] + "/" + ruta[5];
+                    mapa[kybus.lastI][kybus.lastJ].objeto_alpha     = imagen;
+                }else{
+                    if(mapa[kybus.lastI][kybus.lastJ].alpha < 10){
+                        mapa[kybus.lastI][kybus.lastJ].alpha+= 1;
+                    }else{
+                        mapa[kybus.lastI][kybus.lastJ].tipo_obstaculo   = 'arbol';
+                    }
+                }
                 var cordenada = eightDirections(auxUlt,{i : kybus.lastI, j: kybus.lastJ},{i : kybus.i, j: kybus.j},0);
+                
                 if(cordenada.i == kybus.i && cordenada.j == kybus.j){
-                    if(mapa[auxUlt.i][auxUlt.j].tipo_obstaculo == '' ||
-                    (mapa[auxUlt.i][auxUlt.j].objeto_alpha != '' 
-                    && mapa[auxUlt.i][auxUlt.j].alpha < 10)){
+                    
+                    if(mapa[auxUlt.i][auxUlt.j].alpha < 10){
+                        
                         cordenada.i = auxUlt.i;
                         cordenada.j = auxUlt.j;
                     }else{
@@ -684,23 +658,6 @@ function lineaBres(){
             mapa[kybus.lastI][kybus.lastJ].casa           = 0;
             mapa[kybus.lastI][kybus.lastJ].objeto         = '';
             mapa[kybus.lastI][kybus.lastJ].tipo_obstaculo = '';
-            if(mapa[kybus.lastI][kybus.lastJ].objeto_alpha == ''){
-                var elemento = '';
-                var ruta     = '';
-                var imagen   = '';
-                elemento                                        = document.getElementById('arbol');
-                mapa[kybus.lastI][kybus.lastJ].alpha            = 1;
-                ruta                                            = elemento.src.split('/');
-                imagen                                          = new Image();
-                imagen.src                                      = ruta[4] + "/" + ruta[5];
-                mapa[kybus.lastI][kybus.lastJ].objeto_alpha     = imagen;
-            }else{
-                if(mapa[kybus.lastI][kybus.lastJ].alpha < 10){
-                    mapa[kybus.lastI][kybus.lastJ].alpha+= 2;
-                }else{
-                    mapa[kybus.lastI][kybus.lastJ].tipo_obstaculo   = 'arbol';
-                }
-            }
             kybus.x = mapa[kybus.i][kybus.j].x;
             kybus.y = mapa[kybus.i][kybus.j].y;
             mapa[kybus.i][kybus.j].kybus            = 1;
@@ -725,15 +682,31 @@ function lineaBres(){
                 kybus.p+= 2*kybus.dX-2*kybus.dY;
                 kybus.i+= kybus.incrementoX;
             }
-            if(mapa[kybus.i][kybus.j].tipo_obstaculo != '' || 
-                (mapa[kybus.i][kybus.j].alpha >=10 && mapa[kybus.i][kybus.j].objeto_alpha != '')){
-                aux.i = kybus.i;
-                aux.j = kybus.j;
+            
+            if(mapa[kybus.i][kybus.j].alpha >=10){
+                
+                if(mapa[kybus.lastI][kybus.lastJ].objeto_alpha == ''){
+                    var elemento = '';
+                    var ruta     = '';
+                    var imagen   = '';
+                    elemento                                        = document.getElementById('arbol');
+                    mapa[kybus.lastI][kybus.lastJ].alpha            = 1;
+                    ruta                                            = elemento.src.split('/');
+                    imagen                                          = new Image();
+                    imagen.src                                      = ruta[4] + "/" + ruta[5];
+                    mapa[kybus.lastI][kybus.lastJ].objeto_alpha     = imagen;
+                }else{
+                    if(mapa[kybus.lastI][kybus.lastJ].alpha < 10){
+                        mapa[kybus.lastI][kybus.lastJ].alpha+= 1;
+                    }else{
+                        mapa[kybus.lastI][kybus.lastJ].tipo_obstaculo   = 'arbol';
+                    }
+                }
                 var cordenada = eightDirections(auxUlt,{i : kybus.lastI, j: kybus.lastJ},{i : kybus.i, j: kybus.j},0);
                 if(cordenada.i == kybus.i && cordenada.j == kybus.j){
-                    if(mapa[auxUlt.i][auxUlt.j].tipo_obstaculo == '' ||
-                    (mapa[auxUlt.i][auxUlt.j].objeto_alpha != '' 
-                    && mapa[auxUlt.i][auxUlt.j].alpha < 10)){
+                    
+                    if(mapa[auxUlt.i][auxUlt.j].alpha < 10){
+                        
                         cordenada.i = auxUlt.i;
                         cordenada.j = auxUlt.j;
                     }else{
@@ -776,23 +749,6 @@ function lineaBres(){
             mapa[kybus.lastI][kybus.lastJ].casa           = 0;
             mapa[kybus.lastI][kybus.lastJ].objeto         = '';
             mapa[kybus.lastI][kybus.lastJ].tipo_obstaculo = '';
-            if(mapa[kybus.lastI][kybus.lastJ].objeto_alpha == ''){
-                var elemento = '';
-                var ruta     = '';
-                var imagen   = '';
-                elemento                                        = document.getElementById('arbol');
-                mapa[kybus.lastI][kybus.lastJ].alpha            = 1;
-                ruta                                            = elemento.src.split('/');
-                imagen                                          = new Image();
-                imagen.src                                      = ruta[4] + "/" + ruta[5];
-                mapa[kybus.lastI][kybus.lastJ].objeto_alpha     = imagen;
-            }else{
-                if(mapa[kybus.lastI][kybus.lastJ].alpha < 10){
-                    mapa[kybus.lastI][kybus.lastJ].alpha+= 2;
-                }else{
-                    mapa[kybus.lastI][kybus.lastJ].tipo_obstaculo   = 'arbol';
-                }
-            }
             kybus.x = mapa[kybus.i][kybus.j].x;
             kybus.y = mapa[kybus.i][kybus.j].y;
             mapa[kybus.i][kybus.j].kybus            = 1;
