@@ -111,7 +111,7 @@ function drawBackground(){
 }
 
 function drawMapElements(){
-    var bandera = 1;
+    //var bandera = 1;
     while(cantElementos && buscando == undefined){
         var i       = Math.floor((Math.random() * mapa.length) + 0);
         var j       = Math.floor((Math.random() * mapa[0].length) + 0);
@@ -119,15 +119,15 @@ function drawMapElements(){
         var ruta     = '';
         var imagen   = '';
         if(mapa[i][j].objeto == ''){
-            if(bandera){
+            //if(bandera){
                 mapa[i][j].tipo_obstaculo   = 'roca';
                 elemento                    = document.getElementById('roca');
-                bandera                     = 0;
-            }else{
+                //bandera                     = 0;
+            /*}else{
                 mapa[i][j].tipo_obstaculo   = 'arbol';
                 elemento                    = document.getElementById('arbol');
                 bandera                     = 1;
-            }
+            }*/
             mapa[i][j].alpha            = 12;
             mapa[i][j].obstaculo        = 1;
             mapa[i][j].tipo_obstaculo   = elemento.id;
@@ -251,11 +251,7 @@ function drawElements(){
 function drawHeat(){
     for (var i = 0;i < mapa.length;i++) {
         for (var j = 0; j < mapa[0].length;j++) {
-            var elemento  = '';
-            var ruta      = '';
             var imagen    = '';
-            elemento      = document.getElementById('arbol');
-            ruta          = elemento.src.split('/');
             imagen        = new Image();
             imagen.src    = "img/Rojo0.png";
             var x1        = i;

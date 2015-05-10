@@ -1,6 +1,7 @@
 .imagen{
 	max-width: 32px;
 	max-height: 32px;
+    cursor: pointer;
 }
 .mundos{
 	max-width: 10em;
