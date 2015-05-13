@@ -9,7 +9,7 @@
 <body>	
 	<div class="container-fluid">
 		<div class="row well">
-			<strong><h3>Proyecto 3 kybus</h3></strong>
+			<strong><h3>Proyecto 4 kybus</h3></strong>
 		</div>
 		<div class="row">
 			<div class="col-xs-1 well" id = "barra">
@@ -90,15 +90,22 @@
 						<input type="text" id="textInput2" value="6" disabled="disabled">	
 					</div>
 				</div>
-				<div class="col-xs-3 pull-right">
-					<input type="number" id = 'ciclos' min = '1' value= "3" />
-					<label>Ciclos de Entrenamiento</label>
-				</div>
+				
 				<div class="col-xs-1 pull-right">
-					<button class="btn btn-primary col-xs-12" id = "regresar">Regresar</button>	
+					<button class="btn btn-success col-xs-12" id = "inicio">Entrenar</button>	
 					<br><br>
-					<button class="btn btn-success col-xs-12" id = "inicio">Inicio</button>	
-				</div>				
+					<button class="btn btn-primary col-xs-12" id = "regresar">Explotar</button>	
+				</div>	
+				<div class="col-xs-3 pull-right">
+					<div>
+						<input type="checkbox" id = 'ciego'/>
+						<label for = "ciego">Activar modo ciego</label>
+					</div>
+					<div>
+						<label>Ciclos de Entrenamiento</label>
+						<input type="number" id = 'ciclos' min = '1' value= "3" />
+					</div>	
+				</div>
 			</div>
 		</div>
 	</div>
