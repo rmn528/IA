@@ -10,6 +10,7 @@ var pasto          = document.getElementById('pasto');
 var anillos        = document.getElementById('anillos');
 var barras         = document.getElementById('barras');
 var zigzag         = document.getElementById('zigzag');
+var herradura      = document.getElementById('herradura');
 var ciclos         = document.getElementById('ciclos');
 var ciego          = document.getElementById('ciego');
 
@@ -64,6 +65,7 @@ var tamMatrizAdyacencia;
 var cantidadNodos = 1;
 var maxHistorico = 0;
 var minHistorico = 0;
+var caminoCasa = [];
 
 var pila;
 
@@ -102,9 +104,11 @@ function loadMedia(){
         matrizAdyacencia[i] = [];
         for (var j = 1; j <= tamMatrizAdyacencia; j++) {
             matrizAdyacencia[i][j] = {
-                                        costo : 1000000,
+                                        costo : 1000000/2,
                                         conectado : false,
-                                        evaluado : false
+                                        evaluado : false,
+                                        i: -1,
+                                        j: -1
                                      }
         }
     }
@@ -158,6 +162,7 @@ function isInside(newElement,map){
 }
 
 function NewElement(){
+    var nodo;
     if(!jQuery.isEmptyObject(dibujoElemento) && dibujoElemento.x>=0 && dibujoElemento.y>=0 && buscando == undefined){
         for (var i = 0;i < mapa.length;i++) {
             for (var j = 0; j < mapa[0].length;j++) {
@@ -190,6 +195,14 @@ function NewElement(){
                             mapa[casa.i][casa.j].casa = 0; 
                             mapa[casa.i][casa.j].tipo_obstaculo = '';
                             mapa[casa.i][casa.j].objeto = '';
+                            nodo = (casa.i*20) + (casa.j+1);
+                            matrizAdyacencia[nodo][nodo] = {
+                                                                costo : 1000000/2,
+                                                                conectado : false,
+                                                                evaluado : false,
+                                                                i: -1,
+                                                                j: -1
+                                                            }
                         }
                         mapa[i][j].casa  = 1;
                         casa.x           = dibujoElemento.x;
@@ -197,6 +210,10 @@ function NewElement(){
                         casa.i           = i;
                         casa.j           = j;
                         casa.exists      = 1;
+                        nodo = (casa.i*20) + (casa.j+1);
+                        matrizAdyacencia[nodo][nodo].conectado = true;
+                        matrizAdyacencia[nodo][nodo].i         = casa.i;
+                        matrizAdyacencia[nodo][nodo].j         = casa.j;
                     }
                     mapa[i][j].tipo_obstaculo   = dibujoElemento.id;
                     elemento                    = document.getElementById(dibujoElemento.id);
@@ -316,9 +333,11 @@ function addingMouseEvents(){
             matrizAdyacencia[i] = [];
             for (var j = 1; j <= tamMatrizAdyacencia; j++) {
                 matrizAdyacencia[i][j] = {
-                                            costo : 1000000,
+                                            costo : 1000000/2,
                                             conectado : false,
-                                            evaluado : false
+                                            evaluado : false,
+                                            i: -1,
+                                            j: -1
                                          }
             }
         }
@@ -393,9 +412,11 @@ function addingMouseEvents(){
             matrizAdyacencia[i] = [];
             for (var j = 1; j <= tamMatrizAdyacencia; j++) {
                 matrizAdyacencia[i][j] = {
-                                            costo : 1000000,
+                                            costo : 1000000/2,
                                             conectado : false,
-                                            evaluado : false
+                                            evaluado : false,
+                                            i: -1,
+                                            j: -1
                                          }
             }
         }
@@ -470,9 +491,11 @@ function addingMouseEvents(){
             matrizAdyacencia[i] = [];
             for (var j = 1; j <= tamMatrizAdyacencia; j++) {
                 matrizAdyacencia[i][j] = {
-                                            costo : 1000000,
+                                            costo : 1000000/2,
                                             conectado : false,
-                                            evaluado : false
+                                            evaluado : false,
+                                            i: -1,
+                                            j: -1
                                          }
             }
         }
@@ -501,6 +524,85 @@ function addingMouseEvents(){
         dibujarMapas(dibujo);
     });
 
+    addingEvent(herradura,'click',function(e){
+        for (var i = 0;i < mapa.length;i++) {
+            for (var j = 0; j < mapa[0].length;j++) {
+                if(mapa[i][j].tipo_obstaculo == 'kybus'){
+                    if(kybus.exists == 1){
+                        mapa[kybus.i][kybus.j].kybus = 0; 
+                        mapa[kybus.i][kybus.j].tipo_obstaculo = '';
+                        mapa[kybus.i][kybus.j].objeto = '';
+                    }
+                    kybus = {
+                        i : 0,
+                        j : 0,
+                        origenI : 0,
+                        origenJ : 0,
+                        x : 0,
+                        y : 0,
+                        exists : 0,
+                        p : 0,
+                        iterador : 0,
+                    };
+                }else if(mapa[i][j].tipo_obstaculo == 'casa'){
+                    if(casa.exists == 1){
+                        mapa[casa.i][casa.j].casa = 0; 
+                        mapa[casa.i][casa.j].tipo_obstaculo = '';
+                        mapa[casa.i][casa.j].objeto = '';
+                    }
+                    casa = {
+                        i : 0,
+                        j : 0,
+                        x : 0,
+                        y : 0,
+                        exists : 0
+                    };
+                }
+                mapa[i][j].kybus          = 0;
+                mapa[i][j].casa           = 0;
+                mapa[i][j].tipo_obstaculo = '';
+                mapa[i][j].objeto         = '';
+                mapa[i][j].visitado       = false;
+            }
+        }
+        matrizAdyacencia    = [];
+        for (var i = 1; i <= tamMatrizAdyacencia; i++) {
+            matrizAdyacencia[i] = [];
+            for (var j = 1; j <= tamMatrizAdyacencia; j++) {
+                matrizAdyacencia[i][j] = {
+                                            costo : 1000000/2,
+                                            conectado : false,
+                                            evaluado : false,
+                                            i: -1,
+                                            j: -1
+                                         }
+            }
+        }
+        var dibujo = [
+                    [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                    [0,0,0,1,1,1,1,0,0,0,0,0,0,1,1,1,1,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                 ];
+        dibujarMapas(dibujo);
+    });
+
     addingEvent(btnInicio,'click',function(e){
         if(casa.exists && kybus.exists){
             kybus.iterador = 0;
@@ -516,7 +618,13 @@ function addingMouseEvents(){
 
     addingEvent(btnRegresar,'click',function(e){
         if(casa.exists && kybus.exists){
-            console.log("hola");
+            caminoCasa = [];
+            caminoCasa = dijkstra((kybus.origenI*20) + (kybus.origenJ+1), (casa.i*20) + (casa.j+1));
+            if(caminoCasa.length > 0){
+                buscando   = setInterval(pathing,1000/velocidad);
+            }else{
+                console.log("Camino sin salida.");
+            }
         }
     });
 
@@ -598,9 +706,11 @@ function addingMouseEvents(){
             matrizAdyacencia[i] = [];
             for (var j = 1; j <= tamMatrizAdyacencia; j++) {
                 matrizAdyacencia[i][j] = {
-                                            costo : 1000000,
+                                            costo : 1000000/2,
                                             conectado : false,
-                                            evaluado : false
+                                            evaluado : false,
+                                            i: -1,
+                                            j: -1
                                          }
             }
         }
@@ -608,8 +718,6 @@ function addingMouseEvents(){
 }
 
 function avanzar(cordenadaA){
-    var nodoPosViejo;
-    var nodoPosNuevo;
     var auxiliarCordenada = {i:-1,j:-1};
     while (auxiliarCordenada.i == -1 && auxiliarCordenada.j == -1){
         switch(Math.floor((Math.random() * 8) + 1)){
@@ -696,12 +804,14 @@ function training(){
                                                   );
         kybus.i      = nuevaCoordenada.i;
         kybus.j      = nuevaCoordenada.j;
-        nodoPosViejo = (kybus.lastI+1) * (kybus.lastJ+1);
-        nodoPosNuevo = (kybus.i+1) * (kybus.j+1);
+        nodoPosViejo = (kybus.lastI*20) + (kybus.lastJ+1);
+        nodoPosNuevo = (kybus.i*20) + (kybus.j+1);
  
         cantidadNodos++;  
 
         matrizAdyacencia[nodoPosViejo][nodoPosNuevo].conectado = true;
+        matrizAdyacencia[nodoPosViejo][nodoPosNuevo].i         = kybus.i;
+        matrizAdyacencia[nodoPosViejo][nodoPosNuevo].j         = kybus.j;
         pila.push({
                     i : nodoPosViejo,
                     j : nodoPosNuevo
@@ -723,10 +833,12 @@ function training(){
             kybus.iterador++;
             console.log('Recorrido numero #' + kybus.iterador);
             console.log('tamaño del recorrido ' + cantidadNodos);
+            
             if(kybus.iterador == 1){
                 maxHistorico = minHistorico = cantidadNodos;
                 console.log("primer maxHistorico: " + maxHistorico);
                 console.log("primer minHistorico: " + minHistorico);
+                
             }
             var media = mediaHistorica();
             console.log("la media es: " + media);
@@ -744,6 +856,9 @@ function training(){
             console.log("nuevo maxHistorico: " + maxHistorico);
             console.log("nuevo minHistorico: " + minHistorico);
             console.log("");
+            
+            
+            
             var nodo;
             while(pila.length > 0){
                 nodo = pila.shift();
@@ -751,9 +866,11 @@ function training(){
                     matrizAdyacencia[nodo.i][nodo.j].evaluado = true;
                     console.log("voy del nodo " + nodo.i + " al nodo " + nodo.j);
                     console.log("consto antes de aplicar la nota: " + matrizAdyacencia[nodo.i][nodo.j].costo);
+                    
                     matrizAdyacencia[nodo.i][nodo.j].costo += nota;
                     console.log("consto despues de aplicar la nota: " + matrizAdyacencia[nodo.i][nodo.j].costo);
                     console.log("");
+                    
                 }
             }
             for (var i = 1; i <= tamMatrizAdyacencia; i++) {
@@ -813,11 +930,13 @@ function trainingCiego(){
                                                       );
             kybus.i      = nuevaCoordenada.i;
             kybus.j      = nuevaCoordenada.j;
-            nodoPosViejo = (kybus.lastI+1) * (kybus.lastJ+1);
-            nodoPosNuevo = (kybus.i+1) * (kybus.j+1); 
+            nodoPosViejo = (kybus.lastI*20) + (kybus.lastJ+1);
+            nodoPosNuevo = (kybus.i*20) + (kybus.j+1); 
             cantidadNodos++; 
 
             matrizAdyacencia[nodoPosViejo][nodoPosNuevo].conectado = true;
+            matrizAdyacencia[nodoPosViejo][nodoPosNuevo].i         = kybus.i;
+            matrizAdyacencia[nodoPosViejo][nodoPosNuevo].j         = kybus.j;
             pila.push({
                         i : nodoPosViejo,
                         j : nodoPosNuevo
@@ -833,18 +952,20 @@ function trainingCiego(){
                 kybus.iterador++;
                 console.log('Recorrido numero #' + kybus.iterador);
                 console.log('tamaño del recorrido ' + cantidadNodos);
+                
                 if(kybus.iterador == 1){
                     maxHistorico = minHistorico = cantidadNodos;
                     console.log("primer maxHistorico: " + maxHistorico);
                     console.log("primer minHistorico: " + minHistorico);
+                    
                 }
                 var media = mediaHistorica();
-                console.log("la media es: " + media);
+                console.log("la nota es: " + nota);
                 var nota  = Math.abs(media - cantidadNodos);
                 if(cantidadNodos < media){
                     nota = nota * -1;
                 }
-                console.log("la nota es: " + nota);
+                
                 if(cantidadNodos > maxHistorico){
                     maxHistorico = cantidadNodos;
                 } else if(cantidadNodos < minHistorico) {
@@ -854,16 +975,21 @@ function trainingCiego(){
                 console.log("nuevo maxHistorico: " + maxHistorico);
                 console.log("nuevo minHistorico: " + minHistorico);
                 console.log("");
+                
+                
+                
                 var nodo;
                 while(pila.length > 0){
                     nodo = pila.shift();
                     if(!matrizAdyacencia[nodo.i][nodo.j].evaluado){
                         matrizAdyacencia[nodo.i][nodo.j].evaluado = true;
-                        console.log("voy del nodo " + nodo.i + " al nodo " + nodo.j);
+                        console.log("voy del nodo " + nodo.i + " al nodo " + nodo.j + " conectado: " + matrizAdyacencia[nodo.i][nodo.j].conectado);
                         console.log("consto antes de aplicar la nota: " + matrizAdyacencia[nodo.i][nodo.j].costo);
+                        
                         matrizAdyacencia[nodo.i][nodo.j].costo += nota;
                         console.log("consto despues de aplicar la nota: " + matrizAdyacencia[nodo.i][nodo.j].costo);
                         console.log("");
+                        
                     }
                 }
                 for (var i = 1; i <= tamMatrizAdyacencia; i++) {
@@ -875,7 +1001,7 @@ function trainingCiego(){
                 cantidadNodos = 1;
                 kybus.i = kybus.origenI;
                 kybus.j = kybus.origenJ;
-                console.log('');
+                
                 auxUlt   = {i : 0,j : 0};
                 for (var i = 0;i < mapa.length;i++) {
                     for (var j = 0; j < mapa[0].length;j++) {
@@ -893,6 +1019,129 @@ function trainingCiego(){
             console.log("Entrenamiento Terminado");
         }
     }
+}
+
+function meter(dato, monticulo){
+    var aux;
+    posicion = monticulo.length;
+    monticulo.push(dato);
+    while(monticulo[parseInt(posicion/2)].costo > monticulo[posicion].costo){
+        var padre = parseInt(posicion/2);
+        if(posicion%2 == 0){
+            padre = parseInt(posicion/2) - 1;
+        }
+        aux                   = monticulo[posicion];
+        monticulo[posicion]   = monticulo[padre];
+        monticulo[padre] = aux;
+        posicion = padre;
+    }
+}
+
+function sacar(monticulo){
+    var der, izq, i, aux, val;
+    if(monticulo.length > 0){
+        val = monticulo.shift();
+        aux = monticulo.pop();
+        if(aux != undefined){
+            monticulo.unshift(aux);
+        }
+        for(i = 0, izq = (i * 2) +1 , der = izq +1; izq <= monticulo.length ; i++, izq = (i * 2) +1, der = izq +1){
+            if(monticulo.length-1 >= izq){
+                if(monticulo.length-1 >= der){
+                    if(monticulo[izq].costo < monticulo[i].costo){
+                        aux            = monticulo[izq];
+                        monticulo[izq] = monticulo[i];
+                        monticulo[i]   = aux;
+                    }
+                    if(monticulo[der].costo < monticulo[i].costo){
+                        aux            = monticulo[der];
+                        monticulo[der] = monticulo[i];
+                        monticulo[i]   = aux;
+                    }
+                }else if(monticulo[izq].costo < monticulo[i].costo){
+                    aux            = monticulo[izq];
+                    monticulo[izq] = monticulo[i];
+                    monticulo[i]   = aux;
+                }
+            }
+        }
+    }
+
+    return val;
+}
+
+function dijkstra(ini,fin){
+    var ditancias, visitados, actual, i, bandera, ultimo;
+    var monticulo = [];
+    var camino    = [];
+    ditancias = [];
+    visitados = [];
+    for (var i = 1; i <= tamMatrizAdyacencia; i++) {
+        ditancias[i] = {
+                            i : -1,
+                            j : -1,
+                            nodoPosViejo: -1,
+                            nodoPosNuevo: -1,
+                            costo : Number.MAX_VALUE,
+                            camino : []
+                       };
+        visitados[i] = false;
+    };
+    var auxBandera = true;
+    for (var i = 1; i <= tamMatrizAdyacencia; i++) {
+        for (var j = 1; j <= tamMatrizAdyacencia; j++) {
+            if(matrizAdyacencia[i][j].conectado){
+                auxBandera = false;
+            }
+        }
+        visitados[i] = auxBandera;
+        auxBandera   = true;
+    }
+    
+    actual               = ini;
+    bandera              = false;
+    ditancias[ini].costo = 0;
+    while(!bandera){
+        for(var i = 1; i <= tamMatrizAdyacencia; i++){
+            if(matrizAdyacencia[actual][i].conectado && !visitados[i] && 
+                ditancias[i].costo > ditancias[actual].costo + matrizAdyacencia[actual][i].costo){
+                ditancias[i].costo          = ditancias[actual].costo + matrizAdyacencia[actual][i].costo
+                ditancias[i].nodoPosViejo   = actual;
+                ditancias[i].nodoPosNuevo   = i;
+                if(ditancias[actual].camino.length > 0){
+                    ditancias[i].camino = [];
+                    for(var z = 0; z < ditancias[actual].camino.length; z++){
+                        ditancias[i].camino.push(
+                                            {
+                                                i     : ditancias[actual].camino[z].i,
+                                                j     : ditancias[actual].camino[z].j,
+                                            }
+                                          );
+                    }
+                }
+
+                ditancias[i].camino.push(
+                                            {
+                                                i     : matrizAdyacencia[actual][i].i,
+                                                j     : matrizAdyacencia[actual][i].j,
+                                            }
+                                          );
+                meter(ditancias[i],monticulo);
+            }
+        }
+        visitados[actual] = true;
+        actual            = sacar(monticulo);
+        bandera           = true;
+        if(actual != undefined){
+            actual            = actual.nodoPosNuevo;
+            for(var i = 1; i <= tamMatrizAdyacencia; i++){
+                if(!visitados[i]){
+                    bandera = false;
+                }
+            }   
+        }
+    }
+    return ditancias[fin].camino;
 }
 
 function dibujarMapas(dibujo){
@@ -917,6 +1166,44 @@ function dibujarMapas(dibujo){
             }
         }
     }
+}
+
+function pathing(){
+    var casilla;
+    casilla = caminoCasa.shift();
+    mapa[kybus.origenI][kybus.origenJ].kybus          = 0;
+    mapa[kybus.origenI][kybus.origenJ].casa           = 0;
+    mapa[kybus.origenI][kybus.origenJ].objeto         = '';
+    mapa[kybus.origenI][kybus.origenJ].tipo_obstaculo = '';
+
+    kybus.origenI = casilla.i;
+    kybus.origenJ = casilla.j;
+
+    kybus.x = mapa[kybus.origenI][kybus.origenJ].x;
+    kybus.y = mapa[kybus.origenI][kybus.origenJ].y;
+
+    mapa[kybus.origenI][kybus.origenJ].kybus            = 1;
+    mapa[kybus.origenI][kybus.origenJ].tipo_obstaculo   = 'kybus';
+    var elemento                                        = document.getElementById('kybus');
+    var ruta                                            = elemento.src.split('/');
+    var imagen                                          = new Image();
+    imagen.src                                          = ruta[4] + "/" + ruta[5];
+    mapa[kybus.origenI][kybus.origenJ].objeto           = imagen;
+
+    mapa[casa.i][casa.j].casa               = 1;
+    mapa[casa.i][casa.j].tipo_obstaculo     = 'casa';
+    var elemento                            = document.getElementById('casa');
+    var ruta                                = elemento.src.split('/');
+    var imagen                              = new Image();
+    imagen.src                              = ruta[4] + "/" + ruta[5];
+    mapa[casa.i][casa.j].objeto             = imagen;
+
+    if(kybus.origenI == casa.i && kybus.origenJ == casa.j){
+        console.log("Llegue a casa.");
+        clearInterval(buscando);
+        buscando = undefined;
+    }
+
 }
 
 function frameLoop(){
